@@ -39,6 +39,7 @@ def _get_day_context(chat_day) -> str:
 
 # ------------------------------------------------------------------ #
 #  Task 1: Morning brief (runs at 8:30 AM ET / 13:30 UTC weekdays)   #
+#  Example: .venv\Scripts\python.exe manage.py run_pivy_task morning_brief
 # ------------------------------------------------------------------ #
 
 @shared_task(name='pivy_chat.generate_morning_brief')
