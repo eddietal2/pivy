@@ -3,6 +3,7 @@ from django.db import models
 
 class ChatDay(models.Model):
     date = models.DateField(unique=True, help_text="Trading date for this chat thread")
+    title = models.CharField(max_length=120, blank=True, default='', help_text="AI-generated summary title for this day")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

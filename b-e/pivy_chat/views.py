@@ -76,10 +76,23 @@ def days_view(request):
         brief = day.messages.filter(message_type='morning_brief').first()
         preview = (brief.content[:120] + '…') if brief and len(brief.content) > 120 else (brief.content if brief else '')
 
+        # Lazily generate title for existing records that predate the title field
+        title = day.title
+        if not title and brief:
+            try:
+                from pivy_chat.services import PivyChatAgent
+                llm = PivyChatAgent()
+                title = llm.generate_day_title(brief.content)
+                day.title = title
+                day.save(update_fields=['title'])
+            except Exception:
+                title = ''
+
         result.append({
             'date': day.date.isoformat(),
             'message_count': day.message_count,
             'preview': preview,
+            'title': title,
             'has_brief': brief is not None,
         })
 
@@ -143,6 +156,7 @@ def _get_messages(request):
 
     return _json({
         'date': date_str,
+        'title': chat_day.title,
         'messages': messages,
         'pending_personalization': pending_personalization,
     })

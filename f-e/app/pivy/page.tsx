@@ -12,12 +12,18 @@ interface ChatDay {
   date: string; // 'YYYY-MM-DD'
   message_count: number;
   preview: string;
+  title: string;
   has_brief: boolean;
 }
 
 function formatDisplayDate(isoDate: string): string {
   const [year, month, day] = isoDate.split('-');
   return `${month}/${day}/${year.slice(-2)}`;
+}
+
+function getDayOfWeek(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString('en-US', { weekday: 'long' });
 }
 
 const PivyPageContent: React.FC = () => {
@@ -120,22 +126,25 @@ const PivyPageContent: React.FC = () => {
               <li key={chat.date}>
                 <Link href={`/pivy/chat/${chat.date}`} className="block">
                   <div className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm active:opacity-70 transition-opacity">
-                    <div className="flex justify-between items-center mb-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400">{formatDisplayDate(chat.date)}</span>
-                        {chat.date === todayISO && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 text-xs rounded-full font-medium">
-                            <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse inline-block" />
-                            Today
-                          </span>
-                        )}
+                    <div className="flex justify-between items-start mb-1">
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-gray-400 dark:text-gray-500">{getDayOfWeek(chat.date)}, {formatDisplayDate(chat.date)}</span>
+                          {chat.date === todayISO && (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 text-xs rounded-full font-medium">
+                              <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse inline-block" />
+                              Today
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm font-semibold text-gray-900 dark:text-white mt-0.5">{chat.title || 'Market Brief'}</p>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+                      <div className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 shrink-0 ml-2 mt-0.5">
                         <span>{chat.message_count} msg{chat.message_count !== 1 ? 's' : ''}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </div>
                     </div>
-                    <p className="text-sm text-gray-700 dark:text-gray-200 line-clamp-2 leading-relaxed">
+                    <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 leading-relaxed mt-1">
                       {chat.preview || 'No preview available.'}
                     </p>
                   </div>

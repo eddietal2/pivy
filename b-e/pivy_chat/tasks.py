@@ -91,6 +91,15 @@ def generate_morning_brief_task():
             trigger={'source': 'scheduled', 'news_count': len(news), 'earnings_count': len(earnings)},
         )
 
+        # Generate a short title for the day from the brief
+        try:
+            title = llm.generate_day_title(content)
+            chat_day.title = title
+            chat_day.save(update_fields=['title'])
+            logger.info("Day title generated for %s: %s", today, title)
+        except Exception as te:
+            logger.warning("Title generation failed for %s: %s", today, te)
+
         logger.info("Morning brief saved for %s (%d news, %d earnings)", today, len(news), len(earnings))
 
     except Exception as e:

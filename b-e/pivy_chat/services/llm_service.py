@@ -237,10 +237,31 @@ Instructions:
 
         return self._generate(prompt)
 
+    def generate_day_title(self, brief_content: str) -> str:
+        """
+        Generate a short, punchy title (8–12 words) summarising the day's market theme.
+        Returns plain text — no markdown, no punctuation at the end.
+        """
+        prompt = f"""Given the following market morning brief, write a short title (8 to 12 words) that captures the key market theme of the day.
 
-# ------------------------------------------------------------------ #
-#  Formatting helpers                                                  #
-# ------------------------------------------------------------------ #
+Rules:
+- Plain text only — no markdown, no asterisks, no bullet points.
+- No trailing period or punctuation.
+- Sound like a newspaper headline, e.g. "Tech Selloff Continues as Fed Minutes Weigh on Sentiment"
+- Do not start with "Today" or a date.
+
+Morning brief:
+{brief_content[:600]}
+
+Title:""".strip()
+
+        try:
+            raw = self._generate(prompt).strip()
+            # Strip any accidental markdown or quotes
+            raw = raw.strip('*_"`\'')
+            return raw[:120]
+        except Exception:
+            return "Market Brief"
 
 def _format_news(news: list, limit: int = 8) -> str:
     if not news:

@@ -34,7 +34,7 @@ function getUserEmail(): string | null {
   }
 }
 
-/** Renders a subset of markdown: bullet lists, bold, headings, paragraphs */
+/** Renders markdown: bullet lists, bold, headings */
 function renderMarkdown(text: string): React.ReactNode {
   const lines = text.split('\n');
   const nodes: React.ReactNode[] = [];
@@ -59,7 +59,7 @@ function renderMarkdown(text: string): React.ReactNode {
     } else {
       flushList(`list-${i}`);
       if (line.trim() === '') {
-        // skip blank lines between blocks
+        // skip blank lines
       } else if (/^#{1,3}\s+/.test(line)) {
         const content = line.replace(/^#{1,3}\s+/, '');
         nodes.push(<p key={i} className="text-sm font-semibold mt-2">{inlineMarkdown(content)}</p>);
@@ -92,6 +92,7 @@ const PivyChatInstancePage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sending, setSending] = useState(false);
   const [notFound, setNotFound] = useState(false);
+  const [dayTitle, setDayTitle] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const { showToast } = useToast();
@@ -144,6 +145,7 @@ const PivyChatInstancePage: React.FC = () => {
         if (res.ok) {
           const data = await res.json();
           setMessages(data.messages ?? []);
+          if (data.title) setDayTitle(data.title);
         }
       } catch {
         // silent
@@ -212,7 +214,9 @@ const PivyChatInstancePage: React.FC = () => {
           </div>
         ) : (
           <div className="flex-1">
-            <h1 className="text-base font-semibold text-gray-900 dark:text-white">Pivy Chat</h1>
+            <h1 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+              {dayTitle || 'Pivy Chat'}
+            </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400">{formatChatDate(id)}</p>
           </div>
         )}
