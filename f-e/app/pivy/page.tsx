@@ -35,9 +35,16 @@ const PivyPageContent: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAlertVisible, setIsAlertVisible] = useState(true);
   const [isAlertClosing, setIsAlertClosing] = useState(false);
+  const [alertMounted, setAlertMounted] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [notificationsExpanded, setNotificationsExpanded] = useState(false);
   const [aboutExpanded, setAboutExpanded] = useState(false);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem('pivy_welcome_dismissed') === 'true';
+    setIsAlertVisible(!dismissed);
+    setAlertMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchDays = async () => {
@@ -88,14 +95,18 @@ const PivyPageContent: React.FC = () => {
       </header>
 
       {/* Welcome alert */}
-      {isAlertVisible && (
+      {/* For Development, 
+      Object.fromEntries(Object.entries(localStorage))
+      localStorage.clear()
+      */}
+      {alertMounted && isAlertVisible && (
         <div
           className={`bg-yellow-100 dark:bg-yellow-900 border-b border-yellow-200 dark:border-yellow-700 flex justify-between items-center transform transition-all duration-300 ${isAlertClosing ? 'max-h-0 p-0 opacity-0' : 'max-h-20 p-4'}`}
           style={{ overflow: 'hidden' }}
         >
-          <p className="text-yellow-800 dark:text-yellow-200 text-sm">Welcome to Pivy! Each trading day gets its own market brief.</p>
+          <p className="text-yellow-800 dark:text-yellow-200 text-sm">Each weekday at 8:30 AM ET, Pivy drops a morning market brief. During market hours (9:30 AM–4 PM ET), intraday alerts fire automatically for significant moves. Tap any day to read your brief and ask follow-up questions.</p>
           <button
-            onClick={() => { setIsAlertClosing(true); setTimeout(() => setIsAlertVisible(false), 300); }}
+            onClick={() => { setIsAlertClosing(true); setTimeout(() => { setIsAlertVisible(false); localStorage.setItem('pivy_welcome_dismissed', 'true'); }, 300); }}
             className="text-yellow-800 dark:text-yellow-200 hover:text-yellow-900 dark:hover:text-yellow-100 ml-4"
           >Close</button>
         </div>
