@@ -133,6 +133,8 @@ const PivyChatInstancePage: React.FC = () => {
     }
   };
 
+  const prevMessageCountRef = useRef<number | null>(null);
+
   useEffect(() => {
     setMounted(true);
     const fetchMessages = async () => {
@@ -144,7 +146,12 @@ const PivyChatInstancePage: React.FC = () => {
         if (res.status === 404) { setNotFound(true); return; }
         if (res.ok) {
           const data = await res.json();
-          setMessages(data.messages ?? []);
+          const incoming: ChatMessage[] = data.messages ?? [];
+          if (prevMessageCountRef.current !== null && incoming.length > prevMessageCountRef.current) {
+            alert('New message in Pivy Chat!');
+          }
+          prevMessageCountRef.current = incoming.length;
+          setMessages(incoming);
           if (data.title) setDayTitle(data.title);
         }
       } catch {
