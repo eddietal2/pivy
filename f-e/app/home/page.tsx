@@ -135,6 +135,32 @@ export default function App() {
   const retryTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = React.useRef(true);
 
+  // Pivy Chat latest message state
+  const [pivyLatest, setPivyLatest] = React.useState<{ date: string; time: string; title: string; message: string; href: string; isoDate: string; messageType: string } | null>(null);
+
+  React.useEffect(() => {
+    const fetchLatest = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000'}/api/pivy-chat/messages/latest/`);
+        if (!res.ok) return;
+        const data = await res.json();
+        const msg = data.message;
+        if (!msg) return;
+        const msgDate = new Date(msg.created_at);
+        const dateStr = msgDate.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' });
+        const timeStr = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const isoDate = msg.created_at.slice(0, 10);
+        const dayOfWeek = new Date(isoDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' });
+        // Strip leading markdown heading from morning brief content for preview
+        const preview = msg.content.replace(/^#+\s.*\n?/, '').replace(/\*\*/g, '').trim().slice(0, 120);
+        setPivyLatest({ date: dayOfWeek + ', ' + dateStr, time: timeStr, title: data.day_title || 'Morning Brief', message: preview, href: `/pivy/chat/${isoDate}`, isoDate, messageType: msg.message_type });
+      } catch {
+        // silent
+      }
+    };
+    fetchLatest();
+  }, []);
+
   // StockPreviewModal state
   const [previewModalOpen, setPreviewModalOpen] = React.useState(false);
   const [previewStock, setPreviewStock] = React.useState<{
@@ -462,11 +488,11 @@ export default function App() {
 
           <PivyChatCard
             isLoading={isLoading}
-            href="/pivy/chat/0"
-            date="01/07/26"
-            time="10:30 AM"
-            title="This is a very long title that should test the maximum length for display purposes and see how it wraps."
-            message="I'm good, thanks!"
+            href={pivyLatest?.href ?? '/pivy'}
+            date={pivyLatest?.date ?? ''}
+            time={pivyLatest?.time ?? ''}
+            title={pivyLatest?.title ?? ''}
+            message={pivyLatest?.message ?? 'No brief yet today.'}
           />
           <div className="mt-6 text-right">
             <Link href="/pivy?drawer=open&about=open" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">

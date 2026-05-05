@@ -234,7 +234,10 @@ def latest_message_view(request):
     if not msg:
         return _json({'message': None})
 
-    return _json({'message': _serialize_message(msg)})
+    return _json({
+        'message': _serialize_message(msg),
+        'day_title': msg.chat_day.title,
+    })
 
 
 # ------------------------------------------------------------------ #
