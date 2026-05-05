@@ -34,6 +34,53 @@ function getUserEmail(): string | null {
   }
 }
 
+/** Renders a subset of markdown: bullet lists, bold, headings, paragraphs */
+function renderMarkdown(text: string): React.ReactNode {
+  const lines = text.split('\n');
+  const nodes: React.ReactNode[] = [];
+  let listItems: string[] = [];
+
+  const flushList = (key: string) => {
+    if (listItems.length === 0) return;
+    nodes.push(
+      <ul key={key} className="list-disc pl-5 space-y-1 my-1">
+        {listItems.map((item, i) => (
+          <li key={i} className="text-sm leading-relaxed">{inlineMarkdown(item)}</li>
+        ))}
+      </ul>
+    );
+    listItems = [];
+  };
+
+  lines.forEach((line, i) => {
+    const bulletMatch = line.match(/^[*\-]\s+(.*)/);
+    if (bulletMatch) {
+      listItems.push(bulletMatch[1]);
+    } else {
+      flushList(`list-${i}`);
+      if (line.trim() === '') {
+        // skip blank lines between blocks
+      } else if (/^#{1,3}\s+/.test(line)) {
+        const content = line.replace(/^#{1,3}\s+/, '');
+        nodes.push(<p key={i} className="text-sm font-semibold mt-2">{inlineMarkdown(content)}</p>);
+      } else {
+        nodes.push(<p key={i} className="text-sm leading-relaxed">{inlineMarkdown(line)}</p>);
+      }
+    }
+  });
+  flushList('list-end');
+  return <div className="space-y-1">{nodes}</div>;
+}
+
+function inlineMarkdown(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/);
+  return parts.map((part, i) =>
+    part.startsWith('**') && part.endsWith('**')
+      ? <strong key={i}>{part.slice(2, -2)}</strong>
+      : part
+  );
+}
+
 const PivyChatInstancePage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
@@ -203,7 +250,7 @@ const PivyChatInstancePage: React.FC = () => {
                         ? 'bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-700 text-gray-900 dark:text-white'
                         : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow'
                   }`}>
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    <div className="text-sm">{msg.sender === 'ai' ? renderMarkdown(msg.content) : <span className="whitespace-pre-wrap">{msg.content}</span>}</div>
                     <p className={`text-xs mt-1 ${msg.sender === 'user' ? 'text-blue-200' : 'text-gray-400'}`}>
                       {formatTime(msg.created_at)}
                     </p>
