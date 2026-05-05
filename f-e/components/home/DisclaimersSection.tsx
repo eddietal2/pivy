@@ -18,7 +18,7 @@ export default function DisclaimersSection({ isLoading, setStopLossModalOpen, se
       title={
         <div className="flex items-center gap-2">
           <ShieldAlert className="w-5 h-5 text-amber-500" />
-          <span className="text-xl font-bold text-gray-900 dark:text-white">Disclaimers & Risk Notices</span>
+          <span className="text-xl font-bold text-gray-900 dark:text-white">Legal & Risk</span>
         </div>
       }
       defaultOpen={false}

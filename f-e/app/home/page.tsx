@@ -435,25 +435,6 @@ export default function App() {
   React.useEffect(() => {
     fetchRealMarketData();
   }, [fetchRealMarketData]);
-  
-  // Example descriptions for each index
-  const pulseDescriptions: Record<string, string> = {
-    'S&P 500': 'The S&P 500 is a stock market index tracking the performance of 500 large companies listed on stock exchanges in the United States. It is widely regarded as the best single gauge of large-cap U.S. equities.',
-    'VIX (Fear Index)': 'The VIX, or Volatility Index, measures the market’s expectation of volatility over the next 30 days. It is often referred to as the "fear index" and spikes during market turmoil.',
-    'CALL/PUT Ratio': 'The CALL/PUT Ratio measures the number of call options traded relative to put options. It is often used as a sentiment indicator, with higher ratios indicating bullish sentiment and lower ratios indicating bearish sentiment.',
-    '10-Yr Yield': 'The 10-Year Treasury Yield reflects the return on investment for U.S. government bonds maturing in 10 years. It is a key indicator for interest rates and economic outlook.',
-    'Bitcoin': 'Bitcoin (BTC) is the world’s largest cryptocurrency by market capitalization. It is a decentralized digital currency that operates without a central bank and is traded globally 24/7. Bitcoin is often seen as a store of value and a hedge against inflation.',    'AAII Retailer Investor Sentiment': 'The AAII Investor Sentiment Survey measures the percentage of individual investors who are bullish, bearish, or neutral on the stock market for the next six months.',
-    'Gold': 'Gold is a precious metal that has been used as a store of value and a hedge against inflation for centuries. It is traded globally and often moves inversely to the U.S. dollar.',
-    'Silver': 'Silver is a precious metal used in industrial applications as well as investment. It is more volatile than gold and often follows industrial demand trends.',
-    'Crude Oil': 'Crude Oil is a fossil fuel that is refined into various petroleum products. Its price is influenced by global supply and demand, geopolitical events, and economic indicators.',
-    'DOW': 'The Dow Jones Industrial Average (DJIA) is a stock market index that tracks 30 large, publicly-owned companies trading on the New York Stock Exchange and the Nasdaq.',
-    'Nasdaq': 'The Nasdaq Composite is a stock market index that includes almost all stocks listed on the Nasdaq stock exchange. It is heavily weighted towards technology companies.',
-    'Russell 2000': 'The Russell 2000 Index measures the performance of approximately 2,000 small-cap companies in the U.S. equity market. It is a benchmark for small-cap stocks and often moves differently from large-cap indices.',
-    '2-Yr Yield': 'The 2-Year Treasury Yield reflects the return on investment for U.S. government bonds maturing in 2 years. It is sensitive to short-term interest rate expectations and Federal Reserve policy.',
-    'Ethereum': 'Ethereum (ETH) is the second-largest cryptocurrency by market capitalization. It is a decentralized platform for smart contracts and decentralized applications (dApps), often used for DeFi and NFTs.',
-    'Copper': 'Copper is an industrial metal used in construction, electronics, and manufacturing. Its price is a leading indicator of global economic activity and industrial demand.',
-    'Natural Gas': 'Natural Gas is a fossil fuel used for heating, electricity generation, and industrial processes. Its price is influenced by weather patterns, supply levels, and energy demand.',
-  };
 
 
   return (
@@ -472,15 +453,17 @@ export default function App() {
         `}
       </style>
 
+      {/* Fixed Market Status Banner */}
+      <div className="fixed top-0 left-0 right-0 z-50 lg:px-64 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
+        <MarketStatusIndicator variant="banner" className="" />
+      </div>
+
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto lg:px-64">
-        <div className="space-y-8 px-4 sm:p-8 md:mt-10">
-
-          {/* Market Status Banner */}
-          <MarketStatusIndicator variant="banner" className="-mx-4 sm:-mx-8 md:mx-0" />
+        <div className="space-y-8 px-4 sm:p-8 md:mt-10 pt-14">
 
           {/* Current Day Pivy Chat */}
-          <div className="mb-4">
+          <div className="my-4">
             <CandleStickAnim />
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Today's Pivy Chat</h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Catch up on today's conversation with your AI assistant.</p>
@@ -542,7 +525,7 @@ export default function App() {
               title={
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-indigo-500" />
-                  <span className="text-xl font-bold text-gray-900 dark:text-white">Today's Top Market Indicators</span>
+                  <span className="text-xl font-bold text-gray-900 dark:text-white">Market Movers</span>
                 </div>
               }
               defaultOpen={true}

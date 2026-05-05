@@ -5,7 +5,7 @@ This file is meant to be a reference to useful .venv/python commands; Copy and P
 python -m venv venv
 
 # Start venv session
-./.venv/Scripts/Activate.ps1
+./.venv/Scripts/Activate.ps1; python manage.py runserver
 
 * Django Server Commands:
 # Start Django Server
