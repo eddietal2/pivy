@@ -194,9 +194,7 @@ const PivyChatInstancePage: React.FC = () => {
   }
 
   return (
-    <div className={`min-h-screen md:pt-14 transform transition-all duration-500 overflow-hidden ${mounted && !isExiting ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
-      <div className="absolute inset-0 bg-gray-50 dark:bg-gray-900 z-[-1]"></div>
-      
+    <div className={`fixed inset-0 md:top-14 flex flex-col bg-gray-50 dark:bg-gray-900 transform transition-all duration-300 ${mounted && !isExiting ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
       {/* Header */}
       <header className="bg-gray-100 dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex items-center">
         <button 
@@ -239,15 +237,19 @@ const PivyChatInstancePage: React.FC = () => {
       </header>
 
       {/* Chat Messages */}
-      <main ref={mainRef} className="p-4 max-w-4xl mx-auto h-[calc(100vh-8rem)] overflow-y-auto">
+      <main ref={mainRef} className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none' }}>
+        <div className="max-w-2xl mx-auto px-4 py-4">
         {loading ? (
-            // Skeleton for chat messages
           <div className="space-y-4">
-            {Array.from({ length: 5 }, (_, index) => (
-              <div key={index} className={`flex ${index % 2 === 0 ? 'justify-end' : 'justify-start'}`}>
-                <div className="w-full h-12 px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 animate-pulse">
-                  <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4 mb-1"></div>
-                  <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-1/2"></div>
+            {/* AI bubble skeleton */}
+            {[0.6, 0.8, 0.5, 0.75, 0.65].map((w, index) => (
+              <div key={index} className="flex justify-start">
+                <div className="w-full animate-pulse">
+                  <div className="h-20 px-4 py-3 rounded-xl bg-gray-200 dark:bg-gray-700">
+                    <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded mb-2" style={{ width: `${w * 100}%` }}></div>
+                    <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded mb-2 w-full"></div>
+                    <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded" style={{ width: `${(w * 0.7) * 100}%` }}></div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -256,7 +258,7 @@ const PivyChatInstancePage: React.FC = () => {
           <div className="space-y-4">
             {messages.map((msg, index) => (
               <div key={msg.id ?? index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className="flex flex-col gap-1 max-w-xs lg:max-w-md">
+                <div className="flex flex-col gap-1 max-w-[85%]">
                   {msg.sender === 'ai' && msg.message_type === 'intraday_alert' && (
                     <span className="self-start px-2 py-0.5 text-xs font-medium bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-300 rounded-full">Alert</span>
                   )}
@@ -319,18 +321,19 @@ const PivyChatInstancePage: React.FC = () => {
                   setIsExiting(true);
                   setTimeout(() => router.push('/pivy'), 500);
                 }}
-                className="w-full mb-32 px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-red-600 transition-colors"
+                className="w-full px-6 py-2 bg-gray-800 text-white rounded-lg hover:bg-red-600 transition-colors"
               >
                 Close
               </button>
             </div>
           </div>
         )}
+        </div>
       </main>
 
       {/* Input Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4">
-        <div className="max-w-4xl mx-auto flex gap-2">
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 flex-shrink-0">
+        <div className="max-w-2xl mx-auto flex gap-2">
           <input
             type="text"
             value={inputValue}
@@ -357,7 +360,8 @@ const PivyChatInstancePage: React.FC = () => {
         >
           <ChevronDown className="w-5 h-5" />
         </button>
-      )}    </div>
+      )}
+    </div>
   );
 };
 
