@@ -453,14 +453,14 @@ export default function App() {
         `}
       </style>
 
-      {/* Fixed Market Status Banner */}
-      <div className="fixed top-0 md:top-14 left-0 right-0 z-40 lg:px-64 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
+      {/* Fixed Market Status Banner - mobile only (desktop uses TopNav pill) */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
         <MarketStatusIndicator variant="banner" className="" />
       </div>
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-y-auto lg:px-64">
-        <div className="space-y-8 px-4 sm:p-8 md:mt-10 pt-14">
+        <div className="space-y-8 px-4 sm:p-8 md:mt-10 pt-14 md:pt-6">
 
           {/* Current Day Pivy Chat */}
           <div className="my-4">

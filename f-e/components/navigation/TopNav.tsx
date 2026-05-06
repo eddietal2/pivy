@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Home, LineChart, Newspaper, Settings, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/components/context/ThemeContext';
+import MarketStatusIndicator from '@/components/ui/MarketStatusIndicator';
 
 const navLinks = [
   { name: 'Home', href: '/home', icon: Home },
@@ -59,7 +60,9 @@ export default function TopNav() {
         </div>
 
         {/* Theme Toggle & User Menu */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
+          {/* Market Status Pill */}
+          <MarketStatusIndicator variant="pill" showNextEvent={true} />
           {/* Theme Toggle Button */}
           <Button
             variant="ghost"

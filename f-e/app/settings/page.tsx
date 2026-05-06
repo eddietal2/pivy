@@ -477,11 +477,6 @@ export default function SettingsPage() {
   return (
     <div className="container mx-auto px-4 py-8 pb-28 md:pt-24">
       
-      {/* Market Status Banner */}
-      <div className="max-w-2xl mx-auto mb-6">
-        <MarketStatusIndicator variant="banner" className="rounded-xl" />
-      </div>
-      
       {/* Error Message */}
       {loadError && (
         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
