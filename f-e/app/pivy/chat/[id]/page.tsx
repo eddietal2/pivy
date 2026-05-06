@@ -219,9 +219,17 @@ const PivyChatInstancePage: React.FC = () => {
           </div>
         ) : (
           <div className="flex-1">
-            <h1 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
-              {dayTitle || 'Pivy Chat'}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-semibold text-gray-900 dark:text-white leading-tight">
+                {dayTitle || 'Pivy Chat'}
+              </h1>
+              {id === new Date().toISOString().split('T')[0] && (
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300 text-xs rounded-full font-medium">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse inline-block" />
+                  Today
+                </span>
+              )}
+            </div>
             <p className="text-xs text-gray-500 dark:text-gray-400">{formatChatDate(id)}</p>
           </div>
         )}
