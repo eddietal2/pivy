@@ -297,3 +297,87 @@ def _trigger_personalized_insert(chat_day: ChatDay, user):
         )
     except Exception:
         pass
+
+
+# ------------------------------------------------------------------ #
+#  Endpoint: GET /api/pivy-chat/market-snapshot/                      #
+# ------------------------------------------------------------------ #
+
+# Curated large-cap universe used for computing top movers
+_MOVERS_UNIVERSE = [
+    'AAPL', 'MSFT', 'NVDA', 'TSLA', 'AMZN', 'META', 'GOOGL',
+    'NFLX', 'AMD', 'JPM', 'GS', 'BAC', 'V', 'MA',
+    'SPY', 'QQQ', 'IWM',
+]
+
+
+@csrf_exempt
+@require_http_methods(["GET", "OPTIONS"])
+def market_snapshot_view(request):
+    """
+    Return live price/change data for:
+      - ?symbols=AAPL,TSLA  (the user's watchlist symbols, comma-separated)
+      - top 3 daily gainers and top 3 daily losers from a curated universe
+
+    Response shape:
+    {
+      "watchlist": [{"symbol": "AAPL", "price": "193.20", "change": 1.42}],
+      "movers": {
+        "gainers": [{"symbol": "NVDA", "price": "120.50", "change": 4.21}],
+        "losers":  [{"symbol": "BAC",  "price": "38.10",  "change": -2.30}]
+      }
+    }
+    """
+    if request.method == 'OPTIONS':
+        return _options()
+
+    # --- Parse watchlist symbols from query param ---
+    raw_symbols = request.GET.get('symbols', '')
+    watchlist_symbols = [s.strip().upper() for s in raw_symbols.split(',') if s.strip()]
+
+    # Combine into one batch fetch (deduplicated)
+    all_tickers = list(dict.fromkeys(watchlist_symbols + _MOVERS_UNIVERSE))
+
+    try:
+        from financial_data.services import fetch_all_tickers_batch
+        batch = fetch_all_tickers_batch(all_tickers)
+    except Exception as e:
+        logger.error("market_snapshot fetch failed: %s", e)
+        return _json({'error': 'Failed to fetch market data.'}, status=502)
+
+    def _extract(ticker, data):
+        day = data.get('timeframes', {}).get('day', {})
+        latest = day.get('latest', {})
+        return {
+            'symbol': ticker,
+            'price': latest.get('close', '—'),
+            'change': latest.get('change', 0.0),
+        }
+
+    # Build watchlist result
+    watchlist_out = []
+    for sym in watchlist_symbols:
+        row = batch.get(sym, {})
+        if not row.get('error'):
+            watchlist_out.append(_extract(sym, row))
+
+    # Build movers from universe
+    universe_rows = []
+    for sym in _MOVERS_UNIVERSE:
+        row = batch.get(sym, {})
+        if not row.get('error'):
+            day = row.get('timeframes', {}).get('day', {})
+            change = day.get('latest', {}).get('change', 0.0)
+            universe_rows.append({'symbol': sym, 'price': day.get('latest', {}).get('close', '—'), 'change': change})
+
+    universe_rows.sort(key=lambda r: r['change'], reverse=True)
+    gainers = universe_rows[:3]
+    losers = universe_rows[-3:][::-1]  # worst performers, worst-first
+
+    return _json({
+        'watchlist': watchlist_out,
+        'movers': {
+            'gainers': gainers,
+            'losers': losers,
+        },
+    })

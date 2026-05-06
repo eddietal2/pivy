@@ -1,9 +1,10 @@
 'use client';
 import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
-import { ChevronLeft, ChevronRight, ChevronDown, Copy, Check } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Copy, Check, TrendingUp, TrendingDown } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useToast } from '@/components/context/ToastContext';
+import { useFavorites } from '@/components/context/FavoritesContext';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000';
 
@@ -13,6 +14,20 @@ interface ChatMessage {
   message_type: 'morning_brief' | 'intraday_alert' | 'personalized_insert' | 'user_message' | 'ai_response';
   content: string;
   created_at: string;
+}
+
+interface StockPill {
+  symbol: string;
+  price: string;
+  change: number;
+}
+
+interface MarketSnapshot {
+  watchlist: StockPill[];
+  movers: {
+    gainers: StockPill[];
+    losers: StockPill[];
+  };
 }
 
 function formatChatDate(isoDate: string): string {
@@ -85,6 +100,7 @@ const PivyChatInstancePage: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
+  const { favorites } = useFavorites();
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
@@ -96,6 +112,7 @@ const PivyChatInstancePage: React.FC = () => {
   const [dayTitle, setDayTitle] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [marketSnapshot, setMarketSnapshot] = useState<MarketSnapshot | null>(null);
   const { showToast } = useToast();
 
   const mainRef = useRef<HTMLDivElement>(null);
@@ -212,6 +229,20 @@ const PivyChatInstancePage: React.FC = () => {
       if (fastPollRef.current) clearInterval(fastPollRef.current);
     };
   }, [id]);
+
+  // Fetch live market snapshot (watchlist + movers) once messages load
+  useEffect(() => {
+    if (loading) return;
+    const hasBrief = messages.some(m => m.message_type === 'morning_brief');
+    if (!hasBrief) return;
+
+    const symbolsParam = favorites.map(f => f.symbol).join(',');
+    const url = `${BACKEND_URL}/api/pivy-chat/market-snapshot/${symbolsParam ? `?symbols=${symbolsParam}` : ''}`;
+    fetch(url)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setMarketSnapshot(data); })
+      .catch(() => { /* silent */ });
+  }, [loading, messages, favorites]);
 
   useEffect(() => {
     const element = mainRef.current;
@@ -370,6 +401,75 @@ const PivyChatInstancePage: React.FC = () => {
                           {copiedIndex === index ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
                           <span>{copiedIndex === index ? 'Copied' : 'Copy'}</span>
                         </button>
+                      </div>
+                    )}
+
+                    {/* Market snapshot pills — inside morning brief bubble */}
+                    {msg.sender === 'ai' && msg.message_type === 'morning_brief' && marketSnapshot && (
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 space-y-3">
+                        {/* Watchlist */}
+                        {marketSnapshot.watchlist.length > 0 && (
+                          <div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 font-semibold uppercase tracking-wide">Your Watchlist · Yesterday</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {marketSnapshot.watchlist.map(s => (
+                                <Link
+                                  key={s.symbol}
+                                  href={`/stock/${s.symbol}`}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold border transition-colors ${
+                                    s.change >= 0
+                                      ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/50'
+                                      : 'bg-red-50 dark:bg-red-900/30 border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50'
+                                  }`}
+                                >
+                                  <span>{s.symbol}</span>
+                                  <span className="opacity-75">{s.change >= 0 ? '+' : ''}{s.change.toFixed(2)}%</span>
+                                </Link>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Top Movers */}
+                        <div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1.5 font-semibold uppercase tracking-wide">Yesterday's Top Movers</p>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium flex items-center gap-1">
+                                <TrendingUp className="w-3 h-3 text-green-500" /> Gainers
+                              </p>
+                              <div className="flex flex-col gap-1">
+                                {marketSnapshot.movers.gainers.map(s => (
+                                  <Link
+                                    key={s.symbol}
+                                    href={`/stock/${s.symbol}`}
+                                    className="inline-flex items-center justify-between px-2.5 py-1 rounded-lg text-xs font-semibold bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/50 transition-colors"
+                                  >
+                                    <span>{s.symbol}</span>
+                                    <span>+{s.change.toFixed(2)}%</span>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1 font-medium flex items-center gap-1">
+                                <TrendingDown className="w-3 h-3 text-red-500" /> Losers
+                              </p>
+                              <div className="flex flex-col gap-1">
+                                {marketSnapshot.movers.losers.map(s => (
+                                  <Link
+                                    key={s.symbol}
+                                    href={`/stock/${s.symbol}`}
+                                    className="inline-flex items-center justify-between px-2.5 py-1 rounded-lg text-xs font-semibold bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
+                                  >
+                                    <span>{s.symbol}</span>
+                                    <span>{s.change.toFixed(2)}%</span>
+                                  </Link>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
