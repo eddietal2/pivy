@@ -162,7 +162,7 @@ const PivyPageContent: React.FC = () => {
         <div className="hidden md:flex items-center justify-between mb-6">
           <div className="flex items-baseline gap-3">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pivy Chat</h1>
-            <span className="text-sm text-gray-400 dark:text-gray-500">{formatWeekLabel(selectedWeekKey)}</span>
+            <span className="text-sm text-gray-400 dark:text-gray-500">{selectedWeekKey === currentWeekKey ? 'This Week' : 'Previous Week'}</span>
           </div>
           {/* Week selector dropdown */}
           {availableWeeks.length > 1 && (
