@@ -3,16 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Home, LineChart, Newspaper, Settings, Moon, Sun } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/components/context/ThemeContext';
 import MarketStatusIndicator from '@/components/ui/MarketStatusIndicator';
 import CandleStickAnim from '@/components/ui/CandleStickAnim';
 
 const navLinks = [
-  { name: 'Home', href: '/home', icon: Home },
-  { name: 'Watchlist', href: '/watchlist', icon: LineChart },
-  { name: 'Pivy', href: '/pivy', icon: Newspaper },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Home', href: '/home' },
+  { name: 'Watchlist', href: '/watchlist' },
+  { name: 'Pivy', href: '/pivy' },
+  { name: 'Settings', href: '/settings' },
 ];
 
 export default function TopNav() {
@@ -36,7 +36,6 @@ export default function TopNav() {
         {/* Navigation Links - centered */}
         <div className="flex items-center gap-1">
           {navLinks.map((link) => {
-            const Icon = link.icon;
             const isActive = pathname === link.href;
             
             return (
@@ -44,9 +43,8 @@ export default function TopNav() {
                 <Button
                   variant={isActive ? 'default' : 'ghost'}
                   size="sm"
-                  className={`gap-2 font-raleway ${!isActive ? 'bg-transparent text-[#98a0a8] hover:bg-[#164e64] hover:text-white' : 'bg-gradient-to-br from-[#0e74a7] to-[#1fa0c8] text-white shadow-sm'}`}
+                  className={`font-raleway ${!isActive ? 'bg-transparent text-[#98a0a8] hover:bg-[#164e64] hover:text-white' : 'bg-gradient-to-br from-[#0e74a7] to-[#1fa0c8] text-white shadow-sm'}`}
                 >
-                  <Icon className="h-4 w-4" />
                   {link.name}
                 </Button>
               </Link>
