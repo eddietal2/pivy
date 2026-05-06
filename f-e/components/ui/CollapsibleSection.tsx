@@ -193,9 +193,9 @@ export default function CollapsibleSection({ title, infoButton, children, defaul
             </svg>
           </div>
           {/* Title with improved typography */}
-          <span className="text-base font-semibold text-gray-900 dark:text-white tracking-tight">
+          <div className="text-base font-semibold text-gray-900 dark:text-white tracking-tight text-left">
             {title}
-          </span>
+          </div>
         </button>
         {/* Info button (separate, does not toggle collapse) */}
         {infoButton && (

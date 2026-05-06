@@ -9,7 +9,7 @@ import { usePaperTrading } from '@/components/context/PaperTradingContext';
 import { useFavorites } from '@/components/context/FavoritesContext';
 import SignalFeedItem from '@/components/ui/SignalFeedItem';
 import { useUI } from '@/components/context/UIContext';
-import { ListChecks, ArrowUpRight, ArrowDownRight, TrendingUp, Info, X, Cpu, List, Grid, AlertTriangle, FileText, ChevronRight, Star, Activity } from 'lucide-react';
+import { ListChecks, ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown, Info, X, Cpu, List, Grid, AlertTriangle, FileText, ChevronRight, Star, Activity } from 'lucide-react';
 import SignalEducationCard from '@/components/ui/SignalEducationCard';
 import signalEducationCards from '@/components/ui/signalEducationData';
 import WatchListItem from '@/components/watchlist/WatchListItem';
@@ -40,6 +40,27 @@ const tickerNames: Record<string, string> = {
 };
 
 // CollapsibleSection is now an extracted component in components/CollapsibleSection.tsx
+
+// Display names for _MOVERS_UNIVERSE stocks
+const moversNames: Record<string, string> = {
+  'AAPL': 'Apple',
+  'MSFT': 'Microsoft',
+  'NVDA': 'NVIDIA',
+  'TSLA': 'Tesla',
+  'AMZN': 'Amazon',
+  'META': 'Meta',
+  'GOOGL': 'Alphabet',
+  'NFLX': 'Netflix',
+  'AMD': 'AMD',
+  'JPM': 'JPMorgan',
+  'GS': 'Goldman Sachs',
+  'BAC': 'Bank of America',
+  'V': 'Visa',
+  'MA': 'Mastercard',
+  'SPY': 'S&P 500 ETF',
+  'QQQ': 'Nasdaq ETF',
+  'IWM': 'Russell 2000 ETF',
+};
 
 // --- MOCK DATA ---
 
@@ -128,6 +149,8 @@ export default function App() {
   const [marketData, setMarketData] = React.useState<Record<string, any>>({});
   const [topBullish, setTopBullish] = React.useState<any>(null);
   const [topBearish, setTopBearish] = React.useState<any>(null);
+  const [topGainers, setTopGainers] = React.useState<{symbol: string; price: number | string; change: number}[]>([]);
+  const [topLosers, setTopLosers] = React.useState<{symbol: string; price: number | string; change: number}[]>([]);
   const [topIndicatorsLoading, setTopIndicatorsLoading] = React.useState(true);
   const [topIndicatorsError, setTopIndicatorsError] = React.useState<string | null>(null);
   const [retryCount, setRetryCount] = React.useState(0);
@@ -311,6 +334,19 @@ export default function App() {
         console.log('No market data received');
         throw new Error('No market data received from server');
       }
+
+      // Fetch yesterday's top movers (gainers/losers) from market-snapshot
+      try {
+        const snapshotRes = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000'}/api/pivy-chat/market-snapshot/`,
+          { signal: AbortSignal.timeout(15000) }
+        );
+        if (snapshotRes.ok) {
+          const snapshot = await snapshotRes.json();
+          setTopGainers(snapshot.movers?.gainers ?? []);
+          setTopLosers(snapshot.movers?.losers ?? []);
+        }
+      } catch { /* non-fatal — movers are supplementary */ }
     } catch (error: any) {
       console.error('Error fetching market data:', error);
       
@@ -328,6 +364,8 @@ export default function App() {
       setTopIndicatorsError(errorMessage);
       setTopBullish(null);
       setTopBearish(null);
+      setTopGainers([]);
+      setTopLosers([]);
       
       // Auto-retry up to 10 times with backoff
       if (retryCountRef.current < 10 && isMountedRef.current) {
@@ -533,53 +571,105 @@ export default function App() {
           ) : (topBullish || topBearish) && (
             <CollapsibleSection
               title={
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-indigo-500" />
-                  <span className="text-xl font-bold text-gray-900 dark:text-white">Market Movers</span>
+                <div className="flex flex-col gap-0.5 w-full">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-indigo-500" />
+                    <span className="text-xl font-bold text-gray-900 dark:text-white">Yesterday's Market Movers</span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 pl-7">
+                    {(() => { const d = new Date(); d.setDate(d.getDate() - 1); return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }); })()}
+                  </div>
                 </div>
               }
               defaultOpen={true}
               borderBottom={false}
             >
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
-                <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">An AI generated impression of these two together</p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {topBullish && (
-                  <button
-                    onClick={() => openPreviewModal(topBullish.symbol, topBullish.ticker)}
-                    className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors text-left w-full"
-                  >
-                    <div className="flex items-center justify-center w-10 h-10 bg-green-100 dark:bg-green-800 rounded-full">
-                      <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-900 dark:text-white">{topBullish.ticker}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{topBullish.symbol}</div>
-                      <div className="text-lg font-bold text-green-600 dark:text-green-400">
-                        +{topBullish.change?.toFixed(2)}%
+                <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">Performance based on yesterday's closing prices.</p>
+
+                {/* Top index movers — best & worst from tracked indices/commodities */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+                  {topBullish && (
+                    <button
+                      onClick={() => openPreviewModal(topBullish.symbol, topBullish.ticker)}
+                      className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors text-left w-full"
+                    >
+                      <div className="flex items-center justify-center w-9 h-9 bg-green-100 dark:bg-green-800 rounded-full shrink-0">
+                        <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900 dark:text-white truncate">{topBullish.ticker}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{topBullish.symbol}</div>
+                        <div className="text-base font-bold text-green-600 dark:text-green-400">+{topBullish.change?.toFixed(2)}%</div>
+                      </div>
+                    </button>
+                  )}
+                  {topBearish && (
+                    <button
+                      onClick={() => openPreviewModal(topBearish.symbol, topBearish.ticker)}
+                      className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors text-left w-full"
+                    >
+                      <div className="flex items-center justify-center w-9 h-9 bg-red-100 dark:bg-red-800 rounded-full shrink-0">
+                        <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900 dark:text-white truncate">{topBearish.ticker}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">{topBearish.symbol}</div>
+                        <div className="text-base font-bold text-red-600 dark:text-red-400">{topBearish.change?.toFixed(2)}%</div>
+                      </div>
+                    </button>
+                  )}
+                </div>
+
+                {/* Top 3 stock gainers & losers */}
+                {(topGainers.length > 0 || topLosers.length > 0) && (
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Gainers */}
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-green-600 dark:text-green-400 mb-2 flex items-center gap-1">
+                        <TrendingUp className="w-3.5 h-3.5" /> Top Gainers
+                      </p>
+                      <div className="space-y-1.5">
+                        {topGainers.map((s) => (
+                          <button
+                            key={s.symbol}
+                            onClick={() => openPreviewModal(s.symbol, s.symbol)}
+                            className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-green-50 dark:bg-green-900/15 hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors text-left"
+                          >
+                            <div className="min-w-0">
+                              <div className="font-semibold text-sm text-gray-900 dark:text-white">{s.symbol}</div>
+                              {moversNames[s.symbol] && <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{moversNames[s.symbol]}</div>}
+                            </div>
+                            <span className="text-sm font-bold text-green-600 dark:text-green-400 ml-2 shrink-0">+{(+s.change).toFixed(2)}%</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  </button>
-                )}
-                {topBearish && (
-                  <button
-                    onClick={() => openPreviewModal(topBearish.symbol, topBearish.ticker)}
-                    className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors text-left w-full"
-                  >
-                    <div className="flex items-center justify-center w-10 h-10 bg-red-100 dark:bg-red-800 rounded-full">
-                      <TrendingUp className="w-5 h-5 text-red-600 dark:text-red-400 rotate-180" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-900 dark:text-white">{topBearish.ticker}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">{topBearish.symbol}</div>
-                      <div className="text-lg font-bold text-red-600 dark:text-red-400">
-                        {topBearish.change?.toFixed(2)}%
+                    {/* Losers */}
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-2 flex items-center gap-1">
+                        <TrendingDown className="w-3.5 h-3.5" /> Top Losers
+                      </p>
+                      <div className="space-y-1.5">
+                        {topLosers.map((s) => (
+                          <button
+                            key={s.symbol}
+                            onClick={() => openPreviewModal(s.symbol, s.symbol)}
+                            className="flex items-center justify-between w-full px-3 py-2 rounded-lg bg-red-50 dark:bg-red-900/15 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-left"
+                          >
+                            <div className="min-w-0">
+                              <div className="font-semibold text-sm text-gray-900 dark:text-white">{s.symbol}</div>
+                              {moversNames[s.symbol] && <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{moversNames[s.symbol]}</div>}
+                            </div>
+                            <span className="text-sm font-bold text-red-600 dark:text-red-400 ml-2 shrink-0">{(+s.change).toFixed(2)}%</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  </button>
+                  </div>
                 )}
-              </div>
-              <div className="mt-4 text-center">
+
+                <div className="mt-4 text-center">
                   <Link href="/watchlist" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium">
                     View all market indicators →
                   </Link>
