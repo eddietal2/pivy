@@ -1210,7 +1210,7 @@ function WatchlistPageContent() {
       </style>
 
       {/* Fixed Header and Tab Navigation */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      <div className="fixed top-0 md:top-14 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="lg:px-64 px-3 sm:px-8">
           {/* Header Section with CandleStick Animation and Search */}
           <div className="flex items-center justify-between py-2 sm:py-4 border-b border-gray-200 dark:border-gray-700">
@@ -1334,7 +1334,7 @@ function WatchlistPageContent() {
       </div>
 
       {/* Main Content Area - with top padding for fixed header */}
-      <div className="flex-1 overflow-y-auto lg:px-64 pt-[5em] sm:pt-[7em] md:pt-[120px]">
+      <div className="flex-1 overflow-y-auto lg:px-64 pt-[5em] sm:pt-[7em] md:pt-[176px]">
         <div className="p-4 sm:p-8 pt-2 sm:pt-4">
 
           {/* Swipeable Content Container */}

@@ -24,7 +24,7 @@ export default function TopNav() {
     : '/login/logo-v1.png';
 
   return (
-    <nav className="hidden lg:px-64 md:flex fixed top-0 left-0 right-0 z-50 bg-white/6 dark:bg-[#08202d]/40 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+    <nav className="hidden md:flex fixed top-0 left-0 right-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link href="/home" className="relative" style={{ width: '120px', height: '24px' }}>

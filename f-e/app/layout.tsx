@@ -56,7 +56,7 @@ export default function RootLayout({
                 {/* Navigation wrapper conditionally renders TopNav and BottomNav */}
                 <NavigationWrapper />
                 {/* Main Content Area */}
-                <main className="flex-1  md:pb-0 lg:pb-16">
+                <main className="flex-1 md:pb-0">
                   {children}
                 </main>
               </div>

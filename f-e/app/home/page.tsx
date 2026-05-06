@@ -454,7 +454,7 @@ export default function App() {
       </style>
 
       {/* Fixed Market Status Banner */}
-      <div className="fixed top-0 left-0 right-0 z-50 lg:px-64 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
+      <div className="fixed top-0 md:top-14 left-0 right-0 z-40 lg:px-64 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
         <MarketStatusIndicator variant="banner" className="" />
       </div>
 

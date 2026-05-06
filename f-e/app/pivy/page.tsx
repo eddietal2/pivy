@@ -76,7 +76,7 @@ const PivyPageContent: React.FC = () => {
 
 
   return (
-    <div>
+    <div className="md:pt-14">
       {/* Header */}
       <header className="bg-gray-100 dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
         <div className="flex gap-2 items-center">
