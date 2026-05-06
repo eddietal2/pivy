@@ -206,6 +206,7 @@ export default function App() {
   const [topBearish, setTopBearish] = React.useState<any>(null);
   const [topGainers, setTopGainers] = React.useState<{symbol: string; price: number | string; change: number}[]>([]);
   const [topLosers, setTopLosers] = React.useState<{symbol: string; price: number | string; change: number}[]>([]);
+  const [moversLoading, setMoversLoading] = React.useState(true);
   const [topIndicatorsLoading, setTopIndicatorsLoading] = React.useState(true);
   const [topIndicatorsError, setTopIndicatorsError] = React.useState<string | null>(null);
   const [retryCount, setRetryCount] = React.useState(0);
@@ -461,7 +462,9 @@ export default function App() {
           setTopGainers(snapshot.movers?.gainers ?? []);
           setTopLosers(snapshot.movers?.losers ?? []);
         }
-      } catch { /* non-fatal */ }
+      } catch { /* non-fatal */ } finally {
+        if (!cancelled) setMoversLoading(false);
+      }
     };
     fetchMovers();
     return () => { cancelled = true; };
@@ -632,7 +635,7 @@ export default function App() {
                 </button>
               </div>
             </div>
-          ) : (topBullish || topBearish) && (
+          ) : (
             <CollapsibleSection
               title={
                 <div className="flex flex-col gap-0.5 w-full">
@@ -651,47 +654,32 @@ export default function App() {
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700">
                 <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">Performance based on yesterday's closing prices.</p>
 
-                {/* Top index movers — best & worst from tracked indices/commodities */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
-                  {topBullish && (
-                    <button
-                      onClick={() => openPreviewModal(topBullish.symbol, topBullish.ticker)}
-                      className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors text-left w-full"
-                    >
-                      <div className="flex items-center justify-center w-9 h-9 bg-green-100 dark:bg-green-800 rounded-full shrink-0">
-                        <TrendingUp className="w-4 h-4 text-green-600 dark:text-green-400" />
+                {/* Top 10 stock gainers & losers */}
+                {moversLoading ? (
+                  <div className="grid grid-cols-2 gap-4">
+                    {[0, 1].map((col) => (
+                      <div key={col}>
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-24 mb-3 animate-pulse" />
+                        <div className="space-y-1.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <div key={i} className="flex items-center justify-between px-3 py-2 rounded-lg bg-gray-100 dark:bg-gray-700/50 animate-pulse">
+                              <div className="space-y-1">
+                                <div className="h-3.5 bg-gray-300 dark:bg-gray-600 rounded w-12" />
+                                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-20" />
+                              </div>
+                              <div className="h-3.5 bg-gray-300 dark:bg-gray-600 rounded w-14" />
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-900 dark:text-white truncate">{topBullish.ticker}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">{topBullish.symbol}</div>
-                        <div className="text-base font-bold text-green-600 dark:text-green-400">+{topBullish.change?.toFixed(2)}%</div>
-                      </div>
-                    </button>
-                  )}
-                  {topBearish && (
-                    <button
-                      onClick={() => openPreviewModal(topBearish.symbol, topBearish.ticker)}
-                      className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors text-left w-full"
-                    >
-                      <div className="flex items-center justify-center w-9 h-9 bg-red-100 dark:bg-red-800 rounded-full shrink-0">
-                        <TrendingDown className="w-4 h-4 text-red-600 dark:text-red-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-900 dark:text-white truncate">{topBearish.ticker}</div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">{topBearish.symbol}</div>
-                        <div className="text-base font-bold text-red-600 dark:text-red-400">{topBearish.change?.toFixed(2)}%</div>
-                      </div>
-                    </button>
-                  )}
-                </div>
-
-                {/* Top 3 stock gainers & losers */}
-                {(topGainers.length > 0 || topLosers.length > 0) && (
+                    ))}
+                  </div>
+                ) : (topGainers.length > 0 || topLosers.length > 0) && (
                   <div className="grid grid-cols-2 gap-4">
                     {/* Gainers */}
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-green-600 dark:text-green-400 mb-2 flex items-center gap-1">
-                        <TrendingUp className="w-3.5 h-3.5" /> Top Gainers
+                        <TrendingUp className="w-3.5 h-3.5" /> Top 10 Gainers
                       </p>
                       <div className="space-y-1.5">
                         {topGainers.map((s) => (
@@ -712,7 +700,7 @@ export default function App() {
                     {/* Losers */}
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-wide text-red-600 dark:text-red-400 mb-2 flex items-center gap-1">
-                        <TrendingDown className="w-3.5 h-3.5" /> Top Losers
+                        <TrendingDown className="w-3.5 h-3.5" /> Top 10 Losers
                       </p>
                       <div className="space-y-1.5">
                         {topLosers.map((s) => (

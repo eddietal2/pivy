@@ -414,8 +414,8 @@ def market_snapshot_view(request):
             universe_rows.append({'symbol': sym, 'price': day.get('latest', {}).get('close', '—'), 'change': change})
 
     universe_rows.sort(key=lambda r: r['change'], reverse=True)
-    gainers = universe_rows[:3]
-    losers = universe_rows[-3:][::-1]  # worst performers, worst-first
+    gainers = universe_rows[:10]
+    losers = universe_rows[-10:][::-1]  # worst performers, worst-first
 
     return _json({
         'watchlist': watchlist_out,
