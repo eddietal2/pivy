@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 
 // Ticker to name mapping for Market Pulse
 export const MARKET_PULSE_TICKER_NAMES: Record<string, string> = {
@@ -113,30 +113,34 @@ export function useMarketPulseData({
   isActive, 
   pollingInterval = 30000 
 }: UseMarketPulseDataOptions): UseMarketPulseDataReturn {
-  // Data state — seeded from sessionStorage for instant render on return visits
-  const [data, setData] = useState<MarketPulseData>(() => {
-    try {
-      const cached = sessionStorage.getItem(MARKET_PULSE_CACHE_KEY);
-      return cached ? JSON.parse(cached) : {};
-    } catch { return {}; }
-  });
-  const [loading, setLoading] = useState(() => {
-    try { return !sessionStorage.getItem(MARKET_PULSE_CACHE_KEY); } catch { return false; }
-  });
+  // SSR-safe initial state — useLayoutEffect applies sessionStorage cache synchronously
+  // before paint on the client, avoiding hydration mismatches.
+  const [data, setData] = useState<MarketPulseData>({});
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<number | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [backendReady, setBackendReady] = useState(true);
   
-  // Refs — hasFetchedRef starts true if we seeded from cache so polling takes over immediately
+  // Refs — hasFetchedRef is updated in useLayoutEffect if cache exists
   const abortControllerRef = useRef<AbortController | null>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const hasFetchedRef = useRef<boolean>(
-    (() => { try { return !!sessionStorage.getItem(MARKET_PULSE_CACHE_KEY); } catch { return false; } })()
-  );
+  const hasFetchedRef = useRef<boolean>(false);
   const isMountedRef = useRef(true);
   const retryCountRef = useRef(0);
+
+  // Seed state from sessionStorage synchronously before first paint (client only)
+  useLayoutEffect(() => {
+    try {
+      const cached = sessionStorage.getItem(MARKET_PULSE_CACHE_KEY);
+      if (cached) {
+        setData(JSON.parse(cached));
+        setLoading(false);
+        hasFetchedRef.current = true;
+      }
+    } catch { /* sessionStorage unavailable */ }
+  }, []);
 
   // Health check
   const checkBackendHealth = useCallback(async (): Promise<boolean> => {

@@ -48,7 +48,7 @@ def yf_rate_limit_delay():
 # Simple in-memory cache for market data
 _market_data_cache = {}
 _cache_timestamp = None
-CACHE_DURATION_SECONDS = 120  # Cache for 2 minutes (increased to reduce API calls)
+CACHE_DURATION_SECONDS = 600  # Cache for 10 minutes
 
 def format_number_with_commas(value, decimals=2):
     """
