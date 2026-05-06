@@ -1209,8 +1209,8 @@ function WatchlistPageContent() {
         `}
       </style>
 
-      {/* Fixed Header and Tab Navigation */}
-      <div className="fixed top-0 md:top-14 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+      {/* Fixed Header and Tab Navigation - mobile only */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
         <div className="lg:px-64 px-3 sm:px-8">
           {/* Header Section with CandleStick Animation and Search */}
           <div className="flex items-center justify-between py-2 sm:py-4 border-b border-gray-200 dark:border-gray-700">
@@ -1334,8 +1334,42 @@ function WatchlistPageContent() {
       </div>
 
       {/* Main Content Area - with top padding for fixed header */}
-      <div className="flex-1 overflow-y-auto lg:px-64 pt-[5em] sm:pt-[7em] md:pt-[176px]">
+      <div className="flex-1 overflow-y-auto lg:px-64 pt-[5em] sm:pt-[7em] md:pt-20">
         <div className="p-4 sm:p-8 pt-2 sm:pt-4">
+
+          {/* Desktop-only: inline tabs + search */}
+          <div className="hidden md:flex items-center justify-between mb-5">
+            <div className="flex items-center gap-1.5">
+              {[
+                { id: 0, label: 'Market Pulse' },
+                { id: 1, label: 'Live Screens' },
+                { id: 2, label: 'Watchlist' },
+                { id: 3, label: 'My Screens' },
+                { id: 4, label: 'Paper Trading' },
+              ].map((tab) => (
+                <button
+                  key={`dtab-${tab.id}`}
+                  onClick={() => handleTabChange(tab.id)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all duration-200 ${
+                    activeTab === tab.id
+                      ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                      : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            {!isRearrangeMode && (
+              <button
+                onClick={() => setIsSearchOpen(true)}
+                className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                aria-label="Search stocks"
+              >
+                <Search className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              </button>
+            )}
+          </div>
 
           {/* Swipeable Content Container */}
           <div 
