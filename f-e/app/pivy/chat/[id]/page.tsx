@@ -91,6 +91,7 @@ const PivyChatInstancePage: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [sending, setSending] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [dayTitle, setDayTitle] = useState('');
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -113,6 +114,7 @@ const PivyChatInstancePage: React.FC = () => {
     if (!text || sending) return;
     setInputValue('');
     setSending(true);
+    setIsThinking(true);
     try {
       const email = getUserEmail();
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
@@ -124,16 +126,62 @@ const PivyChatInstancePage: React.FC = () => {
       });
       if (res.ok) {
         const data = await res.json();
-        setMessages(prev => [...prev, ...(data.messages ?? [])]);
+        const newMsgs: ChatMessage[] = data.messages ?? [];
+        if (newMsgs.length > 0) {
+          setMessages(prev => {
+            const existingIds = new Set(prev.map(m => m.id));
+            const toAdd = newMsgs.filter(m => !existingIds.has(m.id));
+            return [...prev, ...toAdd];
+          });
+        }
+        // If no AI reply yet (Celery handling it), fast-poll until we get one
+        if (!newMsgs.some(m => m.sender === 'ai')) {
+          startFastPoll();
+        } else {
+          setIsThinking(false);
+        }
       }
     } catch {
       // silent — polling will pick up any saved messages
+      setIsThinking(false);
     } finally {
       setSending(false);
     }
   };
 
   const prevMessageCountRef = useRef<number | null>(null);
+  const fastPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startFastPoll = () => {
+    if (fastPollRef.current) return; // already running
+    let attempts = 0;
+    fastPollRef.current = setInterval(async () => {
+      attempts++;
+      try {
+        const email = getUserEmail();
+        const headers: Record<string, string> = {};
+        if (email) headers['X-User-Email'] = email;
+        const res = await fetch(`${BACKEND_URL}/api/pivy-chat/messages/?date=${id}`, { headers });
+        if (res.ok) {
+          const data = await res.json();
+          const incoming: ChatMessage[] = data.messages ?? [];
+          setMessages(prev => {
+            if (incoming.length > prev.length) {
+              prevMessageCountRef.current = incoming.length;
+              return incoming;
+            }
+            return prev;
+          });
+          const hasAiReply = incoming.some(m => m.sender === 'ai' && m.message_type === 'ai_response');
+          if (hasAiReply || attempts >= 15) {
+            setIsThinking(false);
+            clearInterval(fastPollRef.current!);
+            fastPollRef.current = null;
+          }
+        }
+      } catch { /* silent */ }
+    }, 2000);
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -147,9 +195,6 @@ const PivyChatInstancePage: React.FC = () => {
         if (res.ok) {
           const data = await res.json();
           const incoming: ChatMessage[] = data.messages ?? [];
-          if (prevMessageCountRef.current !== null && incoming.length > prevMessageCountRef.current) {
-            alert('New message in Pivy Chat!');
-          }
           prevMessageCountRef.current = incoming.length;
           setMessages(incoming);
           if (data.title) setDayTitle(data.title);
@@ -162,7 +207,10 @@ const PivyChatInstancePage: React.FC = () => {
     };
     fetchMessages();
     const interval = setInterval(fetchMessages, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (fastPollRef.current) clearInterval(fastPollRef.current);
+    };
   }, [id]);
 
   useEffect(() => {
@@ -178,6 +226,12 @@ const PivyChatInstancePage: React.FC = () => {
       mainRef.current?.scrollTo({ top: mainRef.current.scrollHeight, behavior: 'smooth' });
     }
   }, [loading, messages]);
+
+  useLayoutEffect(() => {
+    if (isThinking) {
+      mainRef.current?.scrollTo({ top: mainRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  }, [isThinking]);
 
 
   if (notFound) {
@@ -322,6 +376,18 @@ const PivyChatInstancePage: React.FC = () => {
                 </div>
               </div>
             ))}
+            {/* Thinking indicator */}
+            {isThinking && (
+              <div className="flex justify-start">
+                <div className="px-4 py-3 rounded-lg bg-white dark:bg-gray-800 shadow">
+                  <div className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </div>
+            )}
             {/* Bottom Close button — mobile only */}
             <div className="flex justify-center mt-12 border-t border-gray-300 dark:border-gray-700 pt-4 md:hidden">
               <button

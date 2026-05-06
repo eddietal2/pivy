@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import date
 
 from django.db.models import Q, Count
@@ -9,6 +10,8 @@ from django.views.decorators.http import require_http_methods
 from django.contrib.auth import get_user_model
 from authentication.models import User as AuthUser
 from .models import ChatDay, ChatMessage
+
+logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------ #
@@ -198,7 +201,8 @@ def _post_message(request):
         user=user,
     )
 
-    # Enqueue AI reply (non-blocking)
+    # Enqueue AI reply (non-blocking Celery task)
+    celery_ok = False
     try:
         from .tasks import generate_ai_reply_task
         generate_ai_reply_task.delay(
@@ -206,11 +210,34 @@ def _post_message(request):
             user_id=user.pk,
             user_message_id=user_msg.pk,
         )
+        celery_ok = True
     except Exception:
-        # If Celery is unavailable (dev without worker), silently skip
         pass
 
-    return _json({'message': _serialize_message(user_msg)}, status=201)
+    # Synchronous fallback when Celery worker is not running
+    ai_msg = None
+    if not celery_ok:
+        try:
+            from .tasks import generate_ai_reply_task
+            generate_ai_reply_task(
+                chat_day_id=chat_day.pk,
+                user_id=user.pk,
+                user_message_id=user_msg.pk,
+            )
+            # Fetch the AI message just created
+            ai_msg = chat_day.messages.filter(
+                sender='ai',
+                message_type='ai_response',
+                user=user,
+            ).order_by('-created_at').first()
+        except Exception as e:
+            logger.warning('Synchronous AI reply failed: %s', e)
+
+    messages_out = [_serialize_message(user_msg)]
+    if ai_msg:
+        messages_out.append(_serialize_message(ai_msg))
+
+    return _json({'messages': messages_out}, status=201)
 
 
 # ------------------------------------------------------------------ #
