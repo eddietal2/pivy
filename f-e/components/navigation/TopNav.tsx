@@ -21,15 +21,19 @@ export default function TopNav() {
 
   return (
     <nav className="hidden md:flex fixed top-0 left-0 right-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/home" className="flex items-center" style={{ overflow: 'hidden', height: '34px' }}>
-          <div style={{ width: '28px', marginTop: '-10px', flexShrink: 0 }}>
-            <CandleStickAnim />
-          </div>
-        </Link>
+      <div className="container mx-auto px-4 py-3 flex items-center">
+        {/* Logo - fixed width to balance right side */}
+        <div className="flex-1 flex items-center">
+          <Link href="/home" className="flex items-center" style={{ overflow: 'hidden', height: '34px' }}>
+            <div style={{ width: '72px', marginTop: '-12px', flexShrink: 0 }}>
+              <div style={{ width: '28px', overflow: 'hidden' }}>
+                <CandleStickAnim />
+              </div>
+            </div>
+          </Link>
+        </div>
 
-        {/* Navigation Links */}
+        {/* Navigation Links - centered */}
         <div className="flex items-center gap-1">
           {navLinks.map((link) => {
             const Icon = link.icon;
@@ -50,8 +54,8 @@ export default function TopNav() {
           })}
         </div>
 
-        {/* Theme Toggle & User Menu */}
-        <div className="flex items-center gap-3">
+        {/* Right side - fixed width to balance logo */}
+        <div className="flex-1 flex items-center justify-end gap-3">
           {/* Market Status Pill */}
           <MarketStatusIndicator variant="pill" showNextEvent={true} />
           {/* Theme Toggle Button */}
