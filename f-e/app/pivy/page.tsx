@@ -50,6 +50,7 @@ const PivyPageContent: React.FC = () => {
 
   const [chatDays, setChatDays] = useState<ChatDay[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cardsVisible, setCardsVisible] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAlertVisible, setIsAlertVisible] = useState(true);
   const [isAlertClosing, setIsAlertClosing] = useState(false);
@@ -86,6 +87,7 @@ const PivyPageContent: React.FC = () => {
         setChatDays([]);
       } finally {
         setLoading(false);
+        requestAnimationFrame(() => setCardsVisible(true));
       }
     };
     fetchDays();
@@ -215,8 +217,12 @@ const PivyPageContent: React.FC = () => {
               {chatDays.length === 0 ? 'No market briefs yet. Check back on the next trading day.' : 'No briefs for this week.'}
             </li>
           ) : (
-            filteredDays.map((chat) => (
-              <li key={chat.date}>
+            filteredDays.map((chat, index) => (
+              <li
+                key={chat.date}
+                className={`transition-all duration-500 ${cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
+                style={{ transitionDelay: `${index * 60}ms` }}
+              >
                 <Link href={`/pivy/chat/${chat.date}`} className="block">
                   <div className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm active:opacity-70 transition-opacity">
                     <div className="flex justify-between items-start mb-1">
