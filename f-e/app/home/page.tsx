@@ -120,7 +120,7 @@ export default function App() {
   }, [pulseViewMode]);
   // Default expansion for Market Pulse is always true; removed UI toggle
   // Instead of inline alerts, disclaimers live in a collapsible section at the bottom
-  // Loading state for skeletons
+  // Loading state for skeletons — start true (SSR-safe), apply cache in useLayoutEffect
   const [isLoading, setIsLoading] = React.useState(true);
   const { showToast } = useToast();
 
@@ -135,8 +135,19 @@ export default function App() {
   const retryTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
   const isMountedRef = React.useRef(true);
 
-  // Pivy Chat latest message state
+  // Pivy Chat latest message state — start null (SSR-safe), apply cache in useLayoutEffect
   const [pivyLatest, setPivyLatest] = React.useState<{ date: string; time: string; title: string; message: string; href: string; isoDate: string; messageType: string } | null>(null);
+
+  // Apply sessionStorage cache synchronously before first paint (client only — no hydration mismatch)
+  React.useLayoutEffect(() => {
+    try {
+      const cached = sessionStorage.getItem('pivy_home_latest');
+      if (cached) {
+        setPivyLatest(JSON.parse(cached));
+        setIsLoading(false);
+      }
+    } catch { /* sessionStorage unavailable */ }
+  }, []);
 
   React.useEffect(() => {
     const fetchLatest = async () => {
@@ -153,9 +164,13 @@ export default function App() {
         const dayOfWeek = new Date(isoDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long' });
         // Strip leading markdown heading from morning brief content for preview
         const preview = msg.content.replace(/^#+\s.*\n?/, '').replace(/\*\*/g, '').trim().slice(0, 120);
-        setPivyLatest({ date: dayOfWeek + ', ' + dateStr, time: timeStr, title: data.day_title || 'Morning Brief', message: preview, href: `/pivy/chat/${isoDate}`, isoDate, messageType: msg.message_type });
+        const latest = { date: dayOfWeek + ', ' + dateStr, time: timeStr, title: data.day_title || 'Morning Brief', message: preview, href: `/pivy/chat/${isoDate}`, isoDate, messageType: msg.message_type };
+        setPivyLatest(latest);
+        try { sessionStorage.setItem('pivy_home_latest', JSON.stringify(latest)); } catch { /* quota */ }
       } catch {
         // silent
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchLatest();
@@ -353,11 +368,7 @@ export default function App() {
   // Track open state of sections
 
 
-  // Simulate loading on mount
-  React.useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 2000); // 2 second loading simulation
-    return () => clearTimeout(timer);
-  }, []);
+
 
   // Post-login toast handler has been moved to RootLayout's PostLoginToastHandler.
 

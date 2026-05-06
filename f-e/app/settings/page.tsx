@@ -15,15 +15,25 @@ export default function SettingsPage() {
   const { showToast } = useToast();
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [showEmailModal, setShowEmailModal] = useState(false);
-  const [currentEmail, setCurrentEmail] = useState('');
+  const [currentEmail, setCurrentEmail] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('user') || '{}').email || ''; } catch { return ''; }
+  });
   const [newEmail, setNewEmail] = useState('');
   const [emailError, setEmailError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => {
+    try {
+      const userString = localStorage.getItem('user');
+      const token = localStorage.getItem('auth_token');
+      return !userString || !token;
+    } catch { return true; }
+  });
   const [loadError, setLoadError] = useState('');
   
   // Username state
-  const [currentUsername, setCurrentUsername] = useState('');
+  const [currentUsername, setCurrentUsername] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('user') || '{}').username || ''; } catch { return ''; }
+  });
   const [showUsernameModal, setShowUsernameModal] = useState(false);
   const [newUsername, setNewUsername] = useState('');
   const [usernameError, setUsernameError] = useState('');
@@ -89,17 +99,10 @@ export default function SettingsPage() {
           return;
         }
         
-        // Simulate slight delay to show skeleton (remove in production if not needed)
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
         // Load user data from localStorage
         const userData = JSON.parse(userString);
-        if (userData.email) {
-          setCurrentEmail(userData.email);
-        }
-        if (userData.username) {
-          setCurrentUsername(userData.username);
-        }
+        if (userData.email) setCurrentEmail(userData.email);
+        if (userData.username) setCurrentUsername(userData.username);
         
         setIsLoading(false);
       } catch (error) {

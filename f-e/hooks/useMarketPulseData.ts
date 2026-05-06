@@ -107,23 +107,34 @@ interface UseMarketPulseDataReturn {
   refresh: () => void;
 }
 
+const MARKET_PULSE_CACHE_KEY = 'mktpulse_data_v1';
+
 export function useMarketPulseData({ 
   isActive, 
   pollingInterval = 30000 
 }: UseMarketPulseDataOptions): UseMarketPulseDataReturn {
-  // Data state
-  const [data, setData] = useState<MarketPulseData>({});
-  const [loading, setLoading] = useState(false);
+  // Data state — seeded from sessionStorage for instant render on return visits
+  const [data, setData] = useState<MarketPulseData>(() => {
+    try {
+      const cached = sessionStorage.getItem(MARKET_PULSE_CACHE_KEY);
+      return cached ? JSON.parse(cached) : {};
+    } catch { return {}; }
+  });
+  const [loading, setLoading] = useState(() => {
+    try { return !sessionStorage.getItem(MARKET_PULSE_CACHE_KEY); } catch { return false; }
+  });
   const [error, setError] = useState<string | null>(null);
   const [lastFetched, setLastFetched] = useState<number | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [backendReady, setBackendReady] = useState(true);
   
-  // Refs
+  // Refs — hasFetchedRef starts true if we seeded from cache so polling takes over immediately
   const abortControllerRef = useRef<AbortController | null>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const hasFetchedRef = useRef(false);
+  const hasFetchedRef = useRef<boolean>(
+    (() => { try { return !!sessionStorage.getItem(MARKET_PULSE_CACHE_KEY); } catch { return false; } })()
+  );
   const isMountedRef = useRef(true);
   const retryCountRef = useRef(0);
 
@@ -212,6 +223,7 @@ export function useMarketPulseData({
       retryCountRef.current = 0;
       setRetryCount(0);
       hasFetchedRef.current = true;
+      try { sessionStorage.setItem(MARKET_PULSE_CACHE_KEY, JSON.stringify(json || {})); } catch { /* quota */ }
       
     } catch (err: any) {
       // Check if this was an intentional cancellation

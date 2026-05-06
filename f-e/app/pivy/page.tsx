@@ -1,5 +1,5 @@
 ﻿'use client';
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, Suspense } from 'react';
 import { ChevronRight, Settings, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -48,9 +48,21 @@ const PivyPageContent: React.FC = () => {
   const searchParams = useSearchParams();
   const todayISO = new Date().toISOString().split('T')[0];
 
+  // Start with SSR-safe initial state; cache applied in useLayoutEffect (client-only, before paint)
   const [chatDays, setChatDays] = useState<ChatDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [cardsVisible, setCardsVisible] = useState(false);
+
+  useLayoutEffect(() => {
+    try {
+      const cached = sessionStorage.getItem('pivy_chat_days');
+      if (cached) {
+        setChatDays(JSON.parse(cached));
+        setLoading(false);
+        requestAnimationFrame(() => setCardsVisible(true));
+      }
+    } catch { /* sessionStorage unavailable */ }
+  }, []);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isAlertVisible, setIsAlertVisible] = useState(true);
   const [isAlertClosing, setIsAlertClosing] = useState(false);
@@ -82,9 +94,11 @@ const PivyPageContent: React.FC = () => {
       try {
         const res = await fetch(`${BACKEND_URL}/api/pivy-chat/days/`);
         const data = await res.json();
-        setChatDays(data.days ?? []);
+        const days = data.days ?? [];
+        setChatDays(days);
+        try { sessionStorage.setItem('pivy_chat_days', JSON.stringify(days)); } catch { /* quota */ }
       } catch {
-        setChatDays([]);
+        // keep stale cache if fetch fails
       } finally {
         setLoading(false);
         requestAnimationFrame(() => setCardsVisible(true));
