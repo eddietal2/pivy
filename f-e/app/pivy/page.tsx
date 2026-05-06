@@ -77,8 +77,8 @@ const PivyPageContent: React.FC = () => {
 
   return (
     <div className="md:pt-14">
-      {/* Header */}
-      <header className="bg-gray-100 dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      {/* Header - mobile only (desktop has TopNav) */}
+      <header className="md:hidden bg-gray-100 dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
         <div className="flex gap-2 items-center">
           <div className="w-[30px] h-[30px] relative bottom-6.5 mr-2">
             <CandleStickAnim />
@@ -113,8 +113,23 @@ const PivyPageContent: React.FC = () => {
       )}
 
       {/* Chat day list */}
-      <main className="p-4">
-        <ul className="space-y-3">
+      <main className="p-4 md:py-8">
+        <div className="max-w-2xl mx-auto">
+          <div className="hidden md:flex items-baseline gap-3 mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pivy Chat</h1>
+            <span className="text-sm text-gray-400 dark:text-gray-500">{(() => {
+              const now = new Date();
+              const day = now.getDay();
+              const monday = new Date(now);
+              monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
+              const friday = new Date(monday);
+              friday.setDate(monday.getDate() + 4);
+              const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+              return `Week of ${fmt(monday)} – ${fmt(friday)}`;
+            })()}</span>
+          </div>
+        </div>
+        <ul className="space-y-3 max-w-2xl mx-auto">
           {loading ? (
             Array.from({ length: 4 }, (_, i) => (
               <li key={i} className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm animate-pulse">
