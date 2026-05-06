@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Home, LineChart, Newspaper, Settings, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/components/context/ThemeContext';
 import MarketStatusIndicator from '@/components/ui/MarketStatusIndicator';
+import CandleStickAnim from '@/components/ui/CandleStickAnim';
 
 const navLinks = [
   { name: 'Home', href: '/home', icon: Home },
@@ -19,23 +19,14 @@ export default function TopNav() {
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
 
-  // Determine logo based on theme (same as login page)
-  const logoSrc = theme === 'dark' 
-    ? '/login/logo-v1-white.png'
-    : '/login/logo-v1.png';
-
   return (
     <nav className="hidden md:flex fixed top-0 left-0 right-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/home" className="relative" style={{ width: '120px', height: '24px' }}>
-          <Image 
-            src={logoSrc} 
-            alt="Pivotal Logo"
-            fill={true} 
-            className="object-contain"
-            priority
-          />
+        <Link href="/home" className="flex items-center" style={{ overflow: 'hidden', height: '34px' }}>
+          <div style={{ width: '28px', marginTop: '-10px', flexShrink: 0 }}>
+            <CandleStickAnim />
+          </div>
         </Link>
 
         {/* Navigation Links */}

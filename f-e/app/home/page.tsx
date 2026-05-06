@@ -464,7 +464,6 @@ export default function App() {
 
           {/* Current Day Pivy Chat */}
           <div className="my-4">
-            <CandleStickAnim />
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Today's Pivy Chat</h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Catch up on today's conversation with your AI assistant.</p>
           </div>
