@@ -470,8 +470,8 @@ export default function App() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto lg:px-64">
-        <div className="space-y-8 px-4 sm:p-8 md:mt-10 pt-14 md:pt-6">
+      <div className="flex-1 overflow-y-auto">
+        <div className="space-y-8 px-4 sm:p-8 md:mt-10 pt-14 md:pt-6 max-w-3xl mx-auto">
 
           {/* Current Day Pivy Chat */}
           <div className="my-4">
