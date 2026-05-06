@@ -194,7 +194,7 @@ const PivyChatInstancePage: React.FC = () => {
   }
 
   return (
-    <div className={`min-h-screen transform transition-all duration-500 overflow-hidden ${mounted && !isExiting ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
+    <div className={`min-h-screen md:pt-14 transform transition-all duration-500 overflow-hidden ${mounted && !isExiting ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}`}>
       <div className="absolute inset-0 bg-gray-50 dark:bg-gray-900 z-[-1]"></div>
       
       {/* Header */}
@@ -227,6 +227,15 @@ const PivyChatInstancePage: React.FC = () => {
             <p className="text-xs text-gray-500 dark:text-gray-400">{formatChatDate(id)}</p>
           </div>
         )}
+        <button
+          onClick={() => {
+            setIsExiting(true);
+            setTimeout(() => router.push('/pivy'), 500);
+          }}
+          className="hidden md:block ml-4 px-4 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+        >
+          Close
+        </button>
       </header>
 
       {/* Chat Messages */}
@@ -303,8 +312,8 @@ const PivyChatInstancePage: React.FC = () => {
                 </div>
               </div>
             ))}
-            {/* Bottom Buttons */}
-            <div className="flex justify-center mt-12 border-t border-gray-300 dark:border-gray-700 pt-4 mt-4">
+            {/* Bottom Close button — mobile only */}
+            <div className="flex justify-center mt-12 border-t border-gray-300 dark:border-gray-700 pt-4 md:hidden">
               <button
                 onClick={() => {
                   setIsExiting(true);
