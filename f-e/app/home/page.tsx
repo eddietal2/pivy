@@ -43,23 +43,78 @@ const tickerNames: Record<string, string> = {
 
 // Display names for _MOVERS_UNIVERSE stocks
 const moversNames: Record<string, string> = {
-  'AAPL': 'Apple',
-  'MSFT': 'Microsoft',
-  'NVDA': 'NVIDIA',
-  'TSLA': 'Tesla',
-  'AMZN': 'Amazon',
-  'META': 'Meta',
-  'GOOGL': 'Alphabet',
-  'NFLX': 'Netflix',
-  'AMD': 'AMD',
-  'JPM': 'JPMorgan',
-  'GS': 'Goldman Sachs',
-  'BAC': 'Bank of America',
-  'V': 'Visa',
-  'MA': 'Mastercard',
-  'SPY': 'S&P 500 ETF',
-  'QQQ': 'Nasdaq ETF',
-  'IWM': 'Russell 2000 ETF',
+  // Mega-cap tech
+  'AAPL':'Apple','MSFT':'Microsoft','NVDA':'NVIDIA','TSLA':'Tesla','AMZN':'Amazon',
+  'META':'Meta','GOOGL':'Alphabet','GOOG':'Alphabet','NFLX':'Netflix','AMD':'AMD',
+  'INTC':'Intel','QCOM':'Qualcomm','AVGO':'Broadcom','TXN':'Texas Instruments',
+  'MU':'Micron','AMAT':'Applied Materials','LRCX':'Lam Research','KLAC':'KLA Corp',
+  'ADI':'Analog Devices','MRVL':'Marvell',
+  // Software / cloud
+  'CRM':'Salesforce','NOW':'ServiceNow','ORCL':'Oracle','SAP':'SAP','ADBE':'Adobe',
+  'INTU':'Intuit','WDAY':'Workday','TEAM':'Atlassian','ZM':'Zoom',
+  'DOCU':'DocuSign','OKTA':'Okta','DDOG':'Datadog','NET':'Cloudflare',
+  'FSLY':'Fastly','CFLT':'Confluent','MDB':'MongoDB','ESTC':'Elastic',
+  // High-volatility growth / fintech
+  'PLTR':'Palantir','SNOW':'Snowflake','UBER':'Uber','LYFT':'Lyft',
+  'RBLX':'Roblox','HOOD':'Robinhood','COIN':'Coinbase','MSTR':'MicroStrategy',
+  'SHOP':'Shopify','SQ':'Block','PYPL':'PayPal','SOFI':'SoFi',
+  'AFRM':'Affirm','UPST':'Upstart','LC':'LendingClub','NU':'Nubank',
+  // AI / quantum / semiconductors
+  'ARM':'Arm Holdings','SMCI':'Super Micro','IONQ':'IonQ','RGTI':'Rigetti',
+  'QUBT':'Quantum Computing','BBAI':'BigBear.ai','AI':'C3.ai','SOUN':'SoundHound',
+  'CRWD':'CrowdStrike','S':'SentinelOne',
+  // Meme / retail favorites
+  'GME':'GameStop','AMC':'AMC Entertainment','BB':'BlackBerry','NOK':'Nokia',
+  'SPCE':'Virgin Galactic','NKLA':'Nikola',
+  // EV / clean energy
+  'RIVN':'Rivian','LCID':'Lucid','NIO':'NIO','XPEV':'XPeng','LI':'Li Auto',
+  'FSR':'Fisker','CHPT':'ChargePoint','BLNK':'Blink Charging','PLUG':'Plug Power',
+  'FCEL':'FuelCell','ENPH':'Enphase','SEDG':'SolarEdge','RUN':'Sunrun','BE':'Bloom Energy',
+  // Biotech / pharma
+  'MRNA':'Moderna','BNTX':'BioNTech','NVAX':'Novavax','BIIB':'Biogen',
+  'GILD':'Gilead','REGN':'Regeneron','VRTX':'Vertex','ILMN':'Illumina',
+  'AMGN':'Amgen','ABBV':'AbbVie','LLY':'Eli Lilly','PFE':'Pfizer',
+  'JNJ':'Johnson & Johnson','MRK':'Merck','BMY':'Bristol-Myers','EXAS':'Exact Sciences',
+  'PACB':'Pacific Biosciences','INCY':'Incyte','SGEN':'Seagen',
+  'ACAD':'Acadia','SAGE':'Sage Therapeutics','FATE':'Fate Therapeutics',
+  'BEAM':'Beam Therapeutics','EDIT':'Editas','CRSP':'CRISPR Therapeutics',
+  // Financials
+  'JPM':'JPMorgan','GS':'Goldman Sachs','BAC':'Bank of America','V':'Visa',
+  'MA':'Mastercard','C':'Citigroup','WFC':'Wells Fargo','MS':'Morgan Stanley',
+  'AXP':'Amex','BLK':'BlackRock','SCHW':'Charles Schwab','COF':'Capital One',
+  'USB':'US Bancorp','TFC':'Truist','ALLY':'Ally Financial','SYF':'Synchrony','DFS':'Discover',
+  // Energy
+  'XOM':'ExxonMobil','CVX':'Chevron','OXY':'Occidental','SLB':'SLB','HAL':'Halliburton',
+  'COP':'ConocoPhillips','EOG':'EOG Resources','MPC':'Marathon Petroleum',
+  'VLO':'Valero','PSX':'Phillips 66','KMI':'Kinder Morgan','WMB':'Williams Cos','ET':'Energy Transfer',
+  // Consumer / retail
+  'WMT':'Walmart','TGT':'Target','COST':'Costco','NKE':'Nike','MCD':"McDonald's",
+  "SBUX":'Starbucks','HD':'Home Depot','LOW':"Lowe's",'TJX':'TJX','ROST':'Ross Stores',
+  'DG':'Dollar General','DLTR':'Dollar Tree','LULU':'Lululemon','RH':'RH','W':'Wayfair',
+  // Media / entertainment
+  'DIS':'Disney','PARA':'Paramount','WBD':'Warner Bros','FOXA':'Fox','SPOT':'Spotify',
+  'SNAP':'Snap','PINS':'Pinterest','RDDT':'Reddit',
+  // Industrial / defense
+  'BA':'Boeing','GE':'GE Aerospace','CAT':'Caterpillar','DE':'Deere','MMM':'3M',
+  'HON':'Honeywell','RTX':'RTX','LMT':'Lockheed Martin','NOC':'Northrop Grumman',
+  'GD':'General Dynamics','HII':'HII',
+  // Healthcare / insurance
+  'UNH':'UnitedHealth','CVS':'CVS Health','CI':'Cigna','HUM':'Humana','MOH':'Molina','CNC':'Centene',
+  // REITs
+  'AMT':'American Tower','CCI':'Crown Castle','EQIX':'Equinix','PLD':'Prologis',
+  'O':'Realty Income','VICI':'VICI Properties','SPG':'Simon Property',
+  // Chinese ADRs
+  'BABA':'Alibaba','JD':'JD.com','PDD':'PDD Holdings','BIDU':'Baidu','TCOM':'Trip.com',
+  // International
+  'TSM':'TSMC','ASML':'ASML',
+  // Leveraged / inverse ETFs
+  'TQQQ':'3x Nasdaq Bull','SQQQ':'3x Nasdaq Bear','SOXL':'3x Semi Bull',
+  'SOXS':'3x Semi Bear','SPXL':'3x S&P Bull','UVXY':'1.5x VIX','VXX':'VIX ST Futures',
+  // Broad / sector ETFs
+  'SPY':'S&P 500 ETF','QQQ':'Nasdaq ETF','IWM':'Russell 2000 ETF','DIA':'Dow ETF',
+  'XLF':'Financials ETF','XLE':'Energy ETF','XLK':'Tech ETF','XLV':'Healthcare ETF',
+  'XLI':'Industrials ETF','XLY':'Consumer Disc ETF','XLP':'Consumer Staples ETF',
+  'XLU':'Utilities ETF','ARKK':'ARK Innovation','ARKG':'ARK Genomics','ARKW':'ARK Internet',
 };
 
 // --- MOCK DATA ---
@@ -335,18 +390,6 @@ export default function App() {
         throw new Error('No market data received from server');
       }
 
-      // Fetch yesterday's top movers (gainers/losers) from market-snapshot
-      try {
-        const snapshotRes = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000'}/api/pivy-chat/market-snapshot/`,
-          { signal: AbortSignal.timeout(15000) }
-        );
-        if (snapshotRes.ok) {
-          const snapshot = await snapshotRes.json();
-          setTopGainers(snapshot.movers?.gainers ?? []);
-          setTopLosers(snapshot.movers?.losers ?? []);
-        }
-      } catch { /* non-fatal — movers are supplementary */ }
     } catch (error: any) {
       console.error('Error fetching market data:', error);
       
@@ -402,6 +445,27 @@ export default function App() {
       }
     };
   }, [fetchMarketData]);
+
+  // Fetch yesterday's top gainers/losers independently — large universe can be slow on first load
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'test') return;
+    let cancelled = false;
+    const fetchMovers = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://127.0.0.1:8000'}/api/pivy-chat/market-snapshot/`,
+          { signal: AbortSignal.timeout(90000) }
+        );
+        if (!cancelled && res.ok) {
+          const snapshot = await res.json();
+          setTopGainers(snapshot.movers?.gainers ?? []);
+          setTopLosers(snapshot.movers?.losers ?? []);
+        }
+      } catch { /* non-fatal */ }
+    };
+    fetchMovers();
+    return () => { cancelled = true; };
+  }, []);
 
   // Track open state of sections
 

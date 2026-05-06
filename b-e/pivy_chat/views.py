@@ -305,9 +305,52 @@ def _trigger_personalized_insert(chat_day: ChatDay, user):
 
 # Curated large-cap universe used for computing top movers
 _MOVERS_UNIVERSE = [
-    'AAPL', 'MSFT', 'NVDA', 'TSLA', 'AMZN', 'META', 'GOOGL',
-    'NFLX', 'AMD', 'JPM', 'GS', 'BAC', 'V', 'MA',
-    'SPY', 'QQQ', 'IWM',
+    # Mega-cap tech
+    'AAPL', 'MSFT', 'NVDA', 'TSLA', 'AMZN', 'META', 'GOOGL', 'GOOG', 'NFLX',
+    'AMD', 'INTC', 'QCOM', 'AVGO', 'TXN', 'MU', 'AMAT', 'LRCX', 'KLAC', 'ADI', 'MRVL',
+    # Software / cloud
+    'CRM', 'NOW', 'ORCL', 'SAP', 'ADBE', 'INTU', 'WDAY', 'TEAM', 'ZM',
+    'DOCU', 'OKTA', 'DDOG', 'NET', 'FSLY', 'CFLT', 'MDB', 'ESTC',
+    # High-volatility growth / fintech
+    'PLTR', 'SNOW', 'UBER', 'LYFT', 'RBLX', 'HOOD', 'COIN', 'MSTR',
+    'SHOP', 'SQ', 'PYPL', 'SOFI', 'AFRM', 'UPST', 'LC', 'NU',
+    # AI / quantum / semiconductors
+    'ARM', 'SMCI', 'IONQ', 'RGTI', 'QUBT', 'BBAI', 'AI', 'SOUN', 'CRWD', 'S',
+    # Meme / retail favorites
+    'GME', 'AMC', 'BB', 'NOK', 'SPCE', 'NKLA',
+    # EV / clean energy
+    'RIVN', 'LCID', 'NIO', 'XPEV', 'LI', 'FSR', 'CHPT', 'BLNK', 'PLUG', 'FCEL',
+    'ENPH', 'SEDG', 'RUN', 'BE',
+    # Biotech / pharma (highly volatile)
+    'MRNA', 'BNTX', 'NVAX', 'BIIB', 'GILD', 'REGN', 'VRTX', 'ILMN',
+    'AMGN', 'ABBV', 'LLY', 'PFE', 'JNJ', 'MRK', 'BMY', 'EXAS', 'PACB',
+    'INCY', 'SGEN', 'ACAD', 'SAGE', 'FATE', 'BEAM', 'EDIT', 'CRSP',
+    # Financials
+    'JPM', 'GS', 'BAC', 'V', 'MA', 'C', 'WFC', 'MS', 'AXP',
+    'BLK', 'SCHW', 'COF', 'USB', 'TFC', 'ALLY', 'SYF', 'DFS',
+    # Energy
+    'XOM', 'CVX', 'OXY', 'SLB', 'HAL', 'COP', 'EOG', 'MPC', 'VLO', 'PSX',
+    'KMI', 'WMB', 'ET',
+    # Consumer / retail
+    'WMT', 'TGT', 'COST', 'NKE', 'MCD', 'SBUX', 'HD', 'LOW',
+    'TJX', 'ROST', 'DG', 'DLTR', 'LULU', 'RH', 'W',
+    # Media / entertainment / streaming
+    'DIS', 'PARA', 'WBD', 'FOXA', 'SPOT', 'SNAP', 'PINS', 'RDDT',
+    # Industrial / defense
+    'BA', 'GE', 'CAT', 'DE', 'MMM', 'HON', 'RTX', 'LMT', 'NOC', 'GD', 'HII',
+    # Healthcare / insurance
+    'UNH', 'CVS', 'CI', 'HUM', 'MOH', 'CNC',
+    # Real estate / REITs
+    'AMT', 'CCI', 'EQIX', 'PLD', 'O', 'VICI', 'SPG',
+    # Chinese ADRs
+    'BABA', 'JD', 'PDD', 'BIDU', 'TCOM',
+    # International
+    'TSM', 'ASML',
+    # Leveraged / inverse ETFs (very volatile)
+    'TQQQ', 'SQQQ', 'SOXL', 'SOXS', 'SPXL', 'UVXY', 'VXX',
+    # Broad market / sector ETFs
+    'SPY', 'QQQ', 'IWM', 'DIA', 'XLF', 'XLE', 'XLK', 'XLV', 'XLI',
+    'XLY', 'XLP', 'XLU', 'ARKK', 'ARKG', 'ARKW',
 ]
 
 
