@@ -475,7 +475,7 @@ export default function SettingsPage() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8 md:pt-24">
+    <div className="container mx-auto px-4 py-8 pb-28 md:pt-24">
       
       {/* Market Status Banner */}
       <div className="max-w-2xl mx-auto mb-6">
@@ -505,13 +505,13 @@ export default function SettingsPage() {
           
           <div className="space-y-4">
             {/* Username Section */}
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-medium">Username</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{currentUsername || 'No username set'}</p>
               </div>
               <button 
-                className="w-32 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                className="flex-shrink-0 w-36 px-3 py-2 text-xs font-medium whitespace-nowrap text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                 onClick={() => setShowUsernameModal(true)}
               >
                 Change Username
@@ -521,13 +521,13 @@ export default function SettingsPage() {
             <hr className="border-gray-200 dark:border-gray-700" />
 
             {/* Change Email Button */}
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-medium">Email Address</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Update your email address</p>
               </div>
               <button 
-                className="w-32 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                className="flex-shrink-0 w-36 px-3 py-2 text-xs font-medium whitespace-nowrap text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                 onClick={() => setShowEmailModal(true)}
               >
                 Change Email
@@ -537,39 +537,39 @@ export default function SettingsPage() {
             <hr className="border-gray-200 dark:border-gray-700" />
 
             {/* Delete Account Button */}
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-medium text-red-600 dark:text-red-400">Delete Account</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Permanently delete your account and all data</p>
               </div>
               <button 
-                className="w-32 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 rounded-lg transition-colors"
+                className="flex-shrink-0 w-36 px-3 py-2 text-xs font-medium whitespace-nowrap text-white bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 rounded-lg transition-colors"
                 onClick={() => setShowDeleteModal(true)}
               >
-                Delete
+                Delete Account
               </button>
             </div>
 
             <hr className="border-gray-200 dark:border-gray-700" />
 
             {/* Logout Section */}
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-medium">Logout</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">End your current session and sign out of your account</p>
               </div>
               <button 
                 onClick={() => setShowLogoutModal(true)}
-                className="w-32 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors"
+                className="flex-shrink-0 w-36 px-3 py-2 text-xs font-medium whitespace-nowrap text-gray-700 dark:text-gray-300 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                Logout
+                Sign Out
               </button>
             </div>
           </div>
           </div>
 
           {/* Display Settings */}
-          <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
+          <div className="p-6 pb-8 border border-gray-200 dark:border-gray-800 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Preferences</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Customize the appearance of the application
@@ -577,8 +577,8 @@ export default function SettingsPage() {
           
           <div className="space-y-4">
             {/* Theme Toggle */}
-            <div className="flex items-center justify-between">
-              <div>
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 flex-1">
                 <h3 className="font-medium">Theme</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                   Switch between light and dark mode
@@ -587,86 +587,23 @@ export default function SettingsPage() {
               <button
                 onClick={handleThemeToggle}
                 aria-label={theme === 'light' ? 'Toggle to dark mode' : 'Toggle to light mode'}
-                className="w-32 px-4 py-2 text-sm font-medium flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="flex-shrink-0 w-36 px-3 py-2 text-xs font-medium flex items-center justify-center gap-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
               >
-                {theme === 'light' ? (
+                {theme === 'dark' ? (
                   <>
                     <Moon className="w-4 h-4" />
-                    <span>Dark</span>
+                    <span>Dark Mode</span>
                   </>
                 ) : (
                   <>
                     <Sun className="w-4 h-4" />
-                    <span>Light</span>
+                    <span>Light Mode</span>
                   </>
                 )}
               </button>
             </div>
             <hr className="border-gray-200 dark:border-gray-700" />
-
-            {/* Market Overview Voice */}
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="min-w-0 flex-1">
-                <h3 className="font-medium">Market Overview Voice</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Select the voice used for the Market Overview TTS (Text-to-Speech)</p>
-              </div>
-              <div className="text-sm text-gray-700 dark:text-gray-300 mr-2 whitespace-nowrap">
-                  Current Voice: <span className="font-semibold">{selectedMvVoice ?? 'Default'}</span>
-                </div>
-                <div className="min-w-[220px]">
-                  <select
-                    aria-label="Select market overview voice"
-                    className="w-full bg-transparent text-sm text-[#777] border border-gray-200 dark:border-gray-700 rounded px-3 py-1"
-                    style={{ fontSize: '130%' }}
-                    value={selectedMvVoice ?? ''}
-                    onChange={(e) => {
-                      const name = e.target.value || null;
-                      setSelectedMvVoice(name);
-                      try { window.localStorage.setItem('mkt_overview_selected_voice', name ?? ''); } catch (_) { /* ignore */ }
-                      try { showToast?.(`Selected Market Overview voice: ${name ?? 'Default'}`, 'info'); } catch (_) {}
-                    }}
-                  >
-                    <option value="">Default</option>
-                    {voices.map(v => (
-                      <option key={`${v.name}-${v.lang}`} value={v.name}>{`${v.name} (${v.lang})`}</option>
-                    ))}
-                  </select>
-                </div>
-              <div className="flex items-center gap-3 flex-shrink-0">
-                
-                <div className="flex-shrink-0">
-                  <button
-                    type="button"
-                    aria-label="Test market overview voice"
-                    onClick={() => {
-                      if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-                        try { showToast?.('Speech synthesis not available', 'error'); } catch (_) {}
-                        return;
-                      }
-                      try {
-                        const t = new SpeechSynthesisUtterance('This is a test for Market Overview voice');
-                        const vlist = window.speechSynthesis.getVoices();
-                        const byName = selectedMvVoice ? vlist.find(v => v.name === selectedMvVoice) : undefined;
-                        if (byName) t.voice = byName;
-                        else {
-                          const lang = navigator.language || 'en-US';
-                          const found = vlist.find(v => v.lang && v.lang.includes(lang));
-                          if (found) t.voice = found;
-                        }
-                        window.speechSynthesis.cancel();
-                        window.speechSynthesis.speak(t);
-                        try { showToast?.('Testing Market Overview voice', 'info'); } catch (_) {}
-                      } catch (e) {
-                        try { showToast?.('Cannot speak test', 'error'); } catch (_) {}
-                      }
-                    }}
-                    className="px-3 py-1 text-sm rounded bg-indigo-600 hover:bg-indigo-700 text-white whitespace-nowrap"
-                  >
-                    Test
-                  </button>
-                </div>
-              </div>
-            </div>
+            
           </div>
           </div>
 
