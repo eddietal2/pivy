@@ -60,7 +60,7 @@ class PivyChatAgent:
                 config=types.GenerateContentConfig(
                     system_instruction=_SYSTEM_PROMPT,
                     temperature=0.7,
-                    max_output_tokens=1024,
+                    max_output_tokens=2048,
                 ),
             )
             return response.text.strip()
@@ -77,14 +77,16 @@ class PivyChatAgent:
         news: list,
         earnings: list,
         index_data: list,
+        economic_events: list = None,
     ) -> str:
         """
         Generate the daily 8:30 AM market brief.
 
         Args:
-            news:       List of news dicts from YahooFinanceNewsService.get_market_news()
-            earnings:   List of earnings dicts from YahooFinanceNewsService.get_earnings_today()
-            index_data: List of price dicts from PriceMonitorService (pre-market snapshot)
+            news:             List of news dicts from YahooFinanceNewsService.get_market_news()
+            earnings:         List of earnings dicts from YahooFinanceNewsService.get_earnings_today()
+            index_data:       List of price dicts from PriceMonitorService (pre-market snapshot)
+            economic_events:  List of event dicts from EconomicCalendarService (optional)
 
         Returns:
             Formatted morning brief as a string.
@@ -92,12 +94,16 @@ class PivyChatAgent:
         news_block = _format_news(news, limit=8)
         earnings_block = _format_earnings(earnings)
         index_block = _format_index_data(index_data)
+        econ_block = _format_economic_events(economic_events or [])
 
         prompt = f"""
             Write a concise morning market brief for Pivy users. Today is a trading day.
 
             ## Pre-market index snapshot
             {index_block}
+
+            ## Today's US economic calendar (key scheduled events)
+            {econ_block}
 
             ## Companies reporting earnings today
             {earnings_block}
@@ -107,10 +113,13 @@ class PivyChatAgent:
 
             Instructions:
             - Open with 1–2 sentences on the overall market mood.
+            - Include a "📅 Today's Economic Calendar" section with bullet points listing
+              each scheduled event, its time, and a one-line plain-English explanation of
+              why it matters. Only include this section if there are events.
             - Summarise the most important 2–3 news items.
             - If there are notable earnings, mention them briefly.
             - Close with 1 sentence on what to watch during the trading session.
-            - Keep the total response under 250 words.
+            - Keep the total response under 350 words.
             """.strip()
 
         return self._generate(prompt)
@@ -262,6 +271,33 @@ Title:""".strip()
             return raw[:120]
         except Exception:
             return "Market Brief"
+
+def _format_economic_events(events: list) -> str:
+    if not events:
+        return "No high/medium-impact US economic events scheduled today."
+    lines = []
+    for e in events:
+        time = e.get('time', '')
+        event = e.get('event', '')
+        actual = e.get('actual')
+        estimate = e.get('estimate')
+        previous = e.get('previous')
+        unit = e.get('unit', '')
+        impact = e.get('impact', '')
+
+        parts = []
+        if actual is not None:
+            parts.append(f"Actual: {actual}{unit}")
+        if estimate is not None:
+            parts.append(f"Est: {estimate}{unit}")
+        if previous is not None:
+            parts.append(f"Prev: {previous}{unit}")
+
+        detail = f" ({', '.join(parts)})" if parts else ''
+        impact_tag = " [HIGH]" if impact == 'High' else ''
+        lines.append(f"- {time}  {event}{detail}{impact_tag}")
+    return "\n".join(lines)
+
 
 def _format_news(news: list, limit: int = 8) -> str:
     if not news:

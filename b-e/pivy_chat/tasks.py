@@ -53,6 +53,7 @@ def generate_morning_brief_task():
     from pivy_chat.models import ChatDay, ChatMessage
     from pivy_chat.services import YahooFinanceNewsService, PivyChatAgent
     from pivy_chat.services.price_monitor import PriceMonitorService
+    from pivy_chat.services.economic_calendar import EconomicCalendarService
 
     logger.info("Starting morning brief generation")
 
@@ -68,9 +69,11 @@ def generate_morning_brief_task():
         news_svc = YahooFinanceNewsService()
         monitor = PriceMonitorService()
         llm = PivyChatAgent()
+        cal_svc = EconomicCalendarService()
 
         news = news_svc.get_market_news()
         earnings = news_svc.get_earnings_today()
+        economic_events = cal_svc.get_events_for_date(today)
 
         # Get pre-market index snapshot (SPY, QQQ, DIA as proxies)
         index_symbols = ['^GSPC', '^DJI', '^IXIC']
@@ -80,7 +83,7 @@ def generate_morning_brief_task():
             if (r := news_svc.get_price_change(sym)) is not None
         ]
 
-        content = llm.generate_morning_brief(news, earnings, index_data)
+        content = llm.generate_morning_brief(news, earnings, index_data, economic_events)
 
         ChatMessage.objects.create(
             chat_day=chat_day,

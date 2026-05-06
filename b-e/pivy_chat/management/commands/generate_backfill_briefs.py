@@ -45,6 +45,7 @@ def _generate_brief_for_date(target_date: date, stdout=None):
     """
     from pivy_chat.models import ChatDay, ChatMessage
     from pivy_chat.services import YahooFinanceNewsService, PivyChatAgent
+    from pivy_chat.services.economic_calendar import EconomicCalendarService
 
     chat_day, created = ChatDay.objects.get_or_create(date=target_date)
 
@@ -56,9 +57,11 @@ def _generate_brief_for_date(target_date: date, stdout=None):
     try:
         news_svc = YahooFinanceNewsService()
         llm = PivyChatAgent()
+        cal_svc = EconomicCalendarService()
 
         news = news_svc.get_market_news()
         earnings = news_svc.get_earnings_today()
+        economic_events = cal_svc.get_events_for_date(target_date)
 
         index_symbols = ['^GSPC', '^DJI', '^IXIC']
         index_data = [
@@ -67,7 +70,7 @@ def _generate_brief_for_date(target_date: date, stdout=None):
             if (r := news_svc.get_price_change(sym)) is not None
         ]
 
-        content = llm.generate_morning_brief(news, earnings, index_data)
+        content = llm.generate_morning_brief(news, earnings, index_data, economic_events)
 
         ChatMessage.objects.create(
             chat_day=chat_day,
