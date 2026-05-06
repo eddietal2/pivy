@@ -1,5 +1,5 @@
 ﻿'use client';
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { ChevronRight, Settings, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -26,6 +26,24 @@ function getDayOfWeek(isoDate: string): string {
   return new Date(year, month - 1, day).toLocaleDateString('en-US', { weekday: 'long' });
 }
 
+function getWeekKey(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number);
+  const d = new Date(year, month - 1, day);
+  const dow = d.getDay();
+  const monday = new Date(d);
+  monday.setDate(d.getDate() - (dow === 0 ? 6 : dow - 1));
+  return monday.toISOString().split('T')[0];
+}
+
+function formatWeekLabel(mondayISO: string): string {
+  const [year, month, day] = mondayISO.split('-').map(Number);
+  const monday = new Date(year, month - 1, day);
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+  const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return `${fmt(monday)} – ${fmt(friday)}`;
+}
+
 const PivyPageContent: React.FC = () => {
   const searchParams = useSearchParams();
   const todayISO = new Date().toISOString().split('T')[0];
@@ -39,6 +57,18 @@ const PivyPageContent: React.FC = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [notificationsExpanded, setNotificationsExpanded] = useState(false);
   const [aboutExpanded, setAboutExpanded] = useState(false);
+
+  // Week selector
+  const currentWeekKey = (() => {
+    const now = new Date();
+    const dow = now.getDay();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (dow === 0 ? 6 : dow - 1));
+    return monday.toISOString().split('T')[0];
+  })();
+  const [selectedWeekKey, setSelectedWeekKey] = useState<string>(currentWeekKey);
+  const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
+  const weekDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const dismissed = localStorage.getItem('pivy_welcome_dismissed') === 'true';
@@ -73,7 +103,21 @@ const PivyPageContent: React.FC = () => {
     return () => { document.body.style.overflow = ''; };
   }, [isDrawerOpen]);
 
+  useEffect(() => {
+    if (!weekDropdownOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (weekDropdownRef.current && !weekDropdownRef.current.contains(e.target as Node)) {
+        setWeekDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [weekDropdownOpen]);
 
+  const availableWeeks = Array.from(new Set(chatDays.map(d => getWeekKey(d.date))))
+    .sort((a, b) => b.localeCompare(a));
+
+  const filteredDays = chatDays.filter(d => getWeekKey(d.date) === selectedWeekKey);
 
   return (
     <div className="md:pt-14">
@@ -115,19 +159,42 @@ const PivyPageContent: React.FC = () => {
       {/* Chat day list */}
       <main className="p-4 md:py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="hidden md:flex items-baseline gap-3 mb-6">
+        <div className="hidden md:flex items-center justify-between mb-6">
+          <div className="flex items-baseline gap-3">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Pivy Chat</h1>
-            <span className="text-sm text-gray-400 dark:text-gray-500">{(() => {
-              const now = new Date();
-              const day = now.getDay();
-              const monday = new Date(now);
-              monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-              const friday = new Date(monday);
-              friday.setDate(monday.getDate() + 4);
-              const fmt = (d: Date) => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-              return `Week of ${fmt(monday)} – ${fmt(friday)}`;
-            })()}</span>
+            <span className="text-sm text-gray-400 dark:text-gray-500">{formatWeekLabel(selectedWeekKey)}</span>
           </div>
+          {/* Week selector dropdown */}
+          {availableWeeks.length > 1 && (
+            <div className="relative" ref={weekDropdownRef}>
+              <button
+                onClick={() => setWeekDropdownOpen(v => !v)}
+                className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-400"
+              >
+                {formatWeekLabel(selectedWeekKey)}
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${weekDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {weekDropdownOpen && (
+                <div className="absolute right-0 top-full mt-1 w-52 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 overflow-hidden">
+                  {availableWeeks.map((weekKey) => (
+                    <button
+                      key={weekKey}
+                      onClick={() => { setSelectedWeekKey(weekKey); setWeekDropdownOpen(false); }}
+                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors flex items-center justify-between ${
+                        selectedWeekKey === weekKey
+                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium'
+                          : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      {formatWeekLabel(weekKey)}
+                      {weekKey === currentWeekKey && <span className="text-xs text-gray-400 ml-2">This week</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         </div>
         <ul className="space-y-3 max-w-2xl mx-auto">
           {loading ? (
@@ -143,12 +210,12 @@ const PivyPageContent: React.FC = () => {
                 </div>
               </li>
             ))
-          ) : chatDays.length === 0 ? (
+          ) : filteredDays.length === 0 ? (
             <li className="p-6 text-center text-sm text-gray-500 dark:text-gray-400">
-              No market briefs yet. Check back on the next trading day.
+              {chatDays.length === 0 ? 'No market briefs yet. Check back on the next trading day.' : 'No briefs for this week.'}
             </li>
           ) : (
-            chatDays.map((chat) => (
+            filteredDays.map((chat) => (
               <li key={chat.date}>
                 <Link href={`/pivy/chat/${chat.date}`} className="block">
                   <div className="p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm active:opacity-70 transition-opacity">
