@@ -362,7 +362,7 @@ export default function WatchListItem({ name, symbol, price, change = 0, valueCh
       ref={containerRef}
       data-drag-index={enableDrag ? dragIndex : undefined}
       draggable={enableDrag}
-      className={`relative overflow-hidden rounded-xl transition-all duration-200 ${
+      className={`relative ${enableSwipe ? 'overflow-hidden' : ''} rounded-xl transition-all duration-200 ${
         isDragging || isTouchDragging ? 'opacity-50 scale-95 z-50' : ''
       } ${
         isDragOver ? 'ring-2 ring-blue-400 ring-offset-2 dark:ring-offset-gray-900' : ''
@@ -403,7 +403,7 @@ export default function WatchListItem({ name, symbol, price, change = 0, valueCh
       
       {/* Main content (slides on swipe) */}
       <div
-        className={`flex items-stretch bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 transition duration-200 w-full ${compactMode ? 'h-16' : 'h-24'} ${isPressed ? 'scale-[0.98] opacity-90' : ''} relative z-20`}
+        className={`flex items-stretch bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-lg border border-gray-200 dark:border-gray-700 transition-all duration-200 w-full ${compactMode ? 'h-14' : 'h-20'} ${isPressed ? 'scale-[0.98] opacity-90' : 'md:hover:shadow-lg md:hover:-translate-y-0.5'} relative z-20`}
         style={{
           transform: `translateX(${swipeX}px)`,
           transition: isSwiping ? 'none' : 'transform 0.2s ease-out',
@@ -492,7 +492,7 @@ export default function WatchListItem({ name, symbol, price, change = 0, valueCh
         <div className="item-press-inner relative">
         <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
-          <p className="text-sm font-medium text-gray-400">{name} ({symbol})</p>
+          <p className="text-xs font-medium text-gray-400">{name} ({symbol})</p>
           {/* Status indicators */}
           {(isInWatchlist || isInSwingScreens || isPaperTrading) && (
             <div className="flex items-center gap-0.5">
@@ -525,12 +525,12 @@ export default function WatchListItem({ name, symbol, price, change = 0, valueCh
           {showSparkline && (
             <div className="flex-shrink-0">
               {sparkline && sparkline.length > 0 && (
-                <Sparkline data={sparkline} width={72} height={28} stroke={sparkStroke} className="rounded" gradient={true} fillOpacity={0.12} />
+                <Sparkline data={sparkline} width={56} height={22} stroke={sparkStroke} className="rounded" gradient={true} fillOpacity={0.12} />
               )}
             </div>
           )}
           <div className="flex flex-col">
-            <span className="text-md lg:text-xl font-bold text-gray-900 dark:text-white">{pricePrefix}{price}{priceSuffix}</span>
+            <span className="text-xs lg:text-sm font-bold text-gray-900 dark:text-white">{pricePrefix}{price}{priceSuffix}</span>
             {showRelativeVolume && typeof rv === 'number' && (
               <span className="text-xs text-gray-500 dark:text-gray-400">RV: {rv.toFixed(2)}x</span>
             )}
@@ -539,7 +539,7 @@ export default function WatchListItem({ name, symbol, price, change = 0, valueCh
         <div className="flex flex-col items-end">
           {/* Price change - respects priceChangeFormat */}
           {(priceChangeFormat === 'percent' || priceChangeFormat === 'both') && (
-            <span className={`text-sm font-semibold ${changeClass} flex items-center`}>
+            <span className={`text-xs font-semibold ${changeClass} flex items-center`}>
               {isUnchanged ? <Minus className="w-4 h-4 mr-1" /> : (isDown ? <ArrowDownRight className="w-4 h-4 mr-1" /> : <ArrowUpRight className="w-4 h-4 mr-1" />)}
               {isUnchanged ? 'Unch' : (change >= 0 ? `+${change.toFixed(2)}%` : `${change.toFixed(2)}%`)}
             </span>

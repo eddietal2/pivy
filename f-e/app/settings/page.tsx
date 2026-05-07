@@ -424,7 +424,7 @@ export default function SettingsPage() {
   const SkeletonLoader = () => (
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Account Settings Skeleton */}
-      <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
+      <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
         <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse" data-testid="skeleton" />
         <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded mb-6 animate-pulse" data-testid="skeleton" />
         
@@ -448,7 +448,7 @@ export default function SettingsPage() {
       </div>
       
       {/* Display Settings Skeleton */}
-      <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
+      <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
         <div className="h-6 w-40 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse" data-testid="skeleton" />
         <div className="h-4 w-72 bg-gray-200 dark:bg-gray-700 rounded mb-6 animate-pulse" data-testid="skeleton" />
         
@@ -462,7 +462,7 @@ export default function SettingsPage() {
       </div>
       
       {/* Notifications Skeleton */}
-      <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
+      <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
         <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4 animate-pulse" data-testid="skeleton" />
         <div className="h-4 w-64 bg-gray-200 dark:bg-gray-700 rounded mb-6 animate-pulse" data-testid="skeleton" />
         
@@ -495,7 +495,7 @@ export default function SettingsPage() {
       ) : (
         <div className="max-w-2xl mx-auto space-y-6">
             {/* Account Settings */}
-          <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg">
+          <div className="p-6 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Account Settings</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Manage your account preferences
@@ -567,7 +567,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Display Settings */}
-          <div className="p-6 pb-8 border border-gray-200 dark:border-gray-800 rounded-lg">
+          <div className="p-6 pb-8 border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
           <h2 className="text-lg font-semibold mb-4">Preferences</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
             Customize the appearance of the application

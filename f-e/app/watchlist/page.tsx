@@ -1194,7 +1194,7 @@ function WatchlistPageContent() {
   };
 
   return (
-    <div className="min-h-screen pb-62 bg-white text-gray-900 dark:bg-gray-900/20 dark:text-white font-sans">
+    <div className="min-h-screen pb-62 bg-transparent text-gray-900 dark:bg-transparent dark:text-white font-sans">
 
       {/* Custom scrollbar styles */}
       <style>
@@ -1385,7 +1385,7 @@ function WatchlistPageContent() {
               }}
             >
               {/* Tab 0: Market Pulse */}
-              <div className="w-full flex-shrink-0 px-4 sm:px-8">
+              <div className="w-full flex-shrink-0 px-6 sm:px-10 pt-2 pb-8">
 
           {/* Getting Started Alert - only render after hydration check (isAlertVisible !== null) */}
           {isAlertVisible === true && (
@@ -1477,7 +1477,7 @@ function WatchlistPageContent() {
           )}
 
           {/* Global Market Pulse */}
-          <div ref={collapsibleSectionRef} className="bg-white dark:bg-gray-900/20 backdrop-blur-md">
+          <div ref={collapsibleSectionRef} className="bg-white dark:bg-gray-900/20 backdrop-blur-md rounded-2xl px-6 pb-6">
             <div>
               {/* Section Header */}
               {!isRearrangeMode && (
@@ -1873,11 +1873,11 @@ function WatchlistPageContent() {
               {/* End Tab 0: Market Pulse */}
 
               {/* Tab 1: Live Screens */}
-              <div className="w-full flex-shrink-0 px-4 sm:px-8">
+              <div className="w-full flex-shrink-0 px-6 sm:px-10 pt-2 pb-8">
           
           {/* Live Screens - hidden during rearrange mode */}
           {!isRearrangeMode && (
-          <div id="live-screens" className="bg-white dark:bg-gray-900/20 backdrop-blur-md">
+          <div id="live-screens" className="bg-white dark:bg-gray-900/20 backdrop-blur-md rounded-2xl px-6 pb-6">
             <div>
               {/* Section Header */}
               <div className="flex items-center justify-between py-4">
@@ -2007,11 +2007,11 @@ function WatchlistPageContent() {
               {/* End Tab 1: Live Screens */}
 
               {/* Tab 2: My Watchlist */}
-              <div className="w-full flex-shrink-0 px-4 sm:px-8">
+              <div className="w-full flex-shrink-0 px-6 sm:px-10 pt-2 pb-8">
 
           {/* My Watchlist - hidden during rearrange mode */}
           {!isRearrangeMode && (
-          <div id="my-watchlist" className="bg-white dark:bg-gray-900/20 backdrop-blur-md">
+          <div id="my-watchlist" className="bg-white dark:bg-gray-900/20 backdrop-blur-md rounded-2xl px-6 pb-6">
             <div>
               {/* Section Header - hidden when error */}
               {!error && (
@@ -2316,11 +2316,11 @@ function WatchlistPageContent() {
               {/* End Tab 2: My Watchlist */}
 
               {/* Tab 3: My Screens */}
-              <div className="w-full flex-shrink-0 px-4 sm:px-8">
+              <div className="w-full flex-shrink-0 px-6 sm:px-10 pt-2 pb-8">
 
                 {/* My Screens - hidden during rearrange mode */}
                 {!isRearrangeMode && (
-                  <div id="my-screens" className="bg-white dark:bg-gray-900/20 backdrop-blur-md">
+                  <div id="my-screens" className="bg-white dark:bg-gray-900/20 backdrop-blur-md rounded-2xl px-6 pb-6">
                     <div>
                       {/* Section Header - hidden when error */}
                       {!error && (
@@ -2479,11 +2479,11 @@ function WatchlistPageContent() {
               {/* End Tab 3: My Screens */}
 
               {/* Tab 4: Paper Trading */}
-              <div className="w-full flex-shrink-0 px-4 sm:px-8">
+              <div className="w-full flex-shrink-0 px-6 sm:px-10 pt-2 pb-8">
 
           {/* Paper Trading - hidden during rearrange mode */}
           {!isRearrangeMode && (
-          <div id="paper-trading" className="bg-white dark:bg-gray-900/20 backdrop-blur-md">
+          <div id="paper-trading" className="bg-white dark:bg-gray-900/20 backdrop-blur-md rounded-2xl px-6 pb-6">
             <div>
               {/* Section Header */}
               <div className="flex items-center justify-between py-4">

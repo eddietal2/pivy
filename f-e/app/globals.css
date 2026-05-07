@@ -45,7 +45,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: oklch(0.985 0 0);
   --foreground: #0a0a0a;
 /* MarketOverview: CLI wrapper hover UX */
   --card: oklch(1 0 0);
@@ -81,6 +81,11 @@
   --sidebar-ring: oklch(0.708 0 0);
   --overlay-line-a: rgba(16,91,146,0.45); /* #105B92 */
   --overlay-line-b: rgba(6,182,212,0.28);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .dark {
@@ -190,14 +195,14 @@
 .market-overview-cli .market-overview-title:focus { outline: none; box-shadow: 0 0 0 3px rgba(6,182,212,0.06); border-radius: 6px; }
 
 /* Subtle press-down hover effect for card-like items */
-.item-press { position: relative; box-sizing: border-box; overflow: hidden; }
+.item-press { position: relative; box-sizing: border-box; }
 .item-press .item-press-inner { transition: transform 140ms cubic-bezier(.2,.9,.2,1), box-shadow 180ms ease, filter 160ms ease; will-change: transform, box-shadow; transform: translateY(0) scale(1); }
-.item-press:hover .item-press-inner, .item-press:focus-within .item-press-inner { transform: translateY(2px) scale(0.998); filter: brightness(0.98); box-shadow: 0 6px 10px rgba(0,0,0,0.04), inset 0 3px 8px rgba(0,0,0,0.03); }
+.item-press:hover .item-press-inner, .item-press:focus-within .item-press-inner { transform: translateY(0) scale(1); filter: brightness(1); box-shadow: none; }
 .item-press .item-press-inner::before { content: ""; pointer-events: none; position: absolute; inset: 0; z-index: -1; border-radius: inherit; box-shadow: none; transition: opacity 200ms ease, box-shadow 200ms ease; opacity: 0; }
-.item-press:hover .item-press-inner::before, .item-press:focus-within .item-press-inner::before { opacity: 1; box-shadow: inset 0 8px 24px rgba(0,0,0,0.04); }
+.item-press:hover .item-press-inner::before, .item-press:focus-within .item-press-inner::before { opacity: 0; box-shadow: none; }
 .item-press:focus-within { outline: none; }
 .item-press .item-press-inner button { transition: transform 140ms ease; }
-.item-press:hover .item-press-inner button, .item-press:focus-within .item-press-inner button { transform: translateY(1.5px); }
+.item-press:hover .item-press-inner button, .item-press:focus-within .item-press-inner button { transform: translateY(0); }
 
 /* Custom scrollbar styles */
 .scrollbar-thin {

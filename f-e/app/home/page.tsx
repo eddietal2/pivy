@@ -554,7 +554,7 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 dark:bg-gray-900/20 dark:text-white font-sans">
+    <div className="min-h-screen bg-transparent text-gray-900 dark:bg-transparent dark:text-white font-sans">
 
       {/* Custom scrollbar styles */}
       <style>
